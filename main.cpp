@@ -22,6 +22,35 @@ enum ZOrder
     zUI
 };
 
+class Position
+{
+public:
+    double x, y;
+    Position(double x, double y):x(x),y(y) {}
+    Position():Position(0, 0){}
+    double distanceSquared(const Position& rhs)
+    {
+        auto diff = *this - rhs;
+        return diff.x*diff.x + diff.y*diff.y;
+    }
+    Position operator-(const Position& rhs)
+    {
+        return Position(x - rhs.x, y - rhs.y);
+    }
+    Position operator+(const Position& rhs)
+    {
+        return Position(x + rhs.x, y + rhs.y);
+    }
+};
+
+namespace std
+{
+    Position abs(const Position& pos)
+    {
+        return Position(std::abs(pos.x), std::abs(pos.y));
+    }
+}
+
 class Node;
 
 class Edge
@@ -54,17 +83,12 @@ namespace std {
     }
 }
 
-struct Node
+struct Node : public Position
 {
 private:
     std::vector<std::unique_ptr<Edge>> _edges;
 public:
-    double x, y;
-    Node(double x, double y)
-    :x(x)
-    ,y(y)
-    {
-    }
+    Node(Position pos = Position()):Position(pos){}
     
     const std::vector<std::unique_ptr<Edge>>& Edges() const { return _edges; }
     
@@ -101,13 +125,13 @@ public:
     {
     }
     
-    optional<Node&> GetNearestNode(double x, double y)
+    optional<Node&> GetNearestNode(Position pos)
     {
         optional<Node&> found;
         double dist;
         for (auto& node:Nodes) {
             if (!node) continue;
-            auto _dist = (x - node->x)*(x - node->x) + (y - node->y)*(y - node->y);
+            auto _dist = pos.distanceSquared(*node);
             if (!found) {
                 found.emplace(*node);
                 dist = _dist;
@@ -121,11 +145,11 @@ public:
         return found;
     }
 
-    Node& CreateNode(double x, double y)
+    Node& CreateNode(Position pos)
     {
         for (auto& node:Nodes) {
             if (node) continue;
-            node.emplace(x, y);
+            node.emplace(pos);
             NodeCount++;
             return *node;
         }
@@ -173,6 +197,7 @@ class GameWindow : public Gosu::Window
     Gosu::Font font;
     optional<Gosu::Image> img;
     Graph graph;
+    optional<Node&> grabbedNode;
 public:
     GameWindow()
     :Window(640, 480, false)
@@ -211,13 +236,17 @@ public:
         }
         img.emplace(std::ref(graphics()), bmp);
         
-        auto& node = graph.CreateNode(100, 100);
-        auto& node2 = graph.CreateNode(150, 200);
+        auto& node = graph.CreateNode(Position(100, 100));
+        auto& node2 = graph.CreateNode(Position(150, 200));
         node.connect(node2);
     }
 
     void update()
     {
+        if (grabbedNode) {
+            grabbedNode->x = input().mouseX();
+            grabbedNode->y = input().mouseY();
+        }
     }
 
     void draw()
@@ -229,7 +258,7 @@ public:
             input().mouseX()+5, input().mouseY()+20, Gosu::Color::WHITE,
             zUI
         );
-        auto nearest = graph.GetNearestNode(input().mouseX(), input().mouseY());
+        auto nearest = graph.GetNearestNode(Position(input().mouseX(), input().mouseY()));
         if (nearest) {
             graphics().drawLine(
                 input().mouseX(), input().mouseY(), Gosu::Color::GREEN,
@@ -243,6 +272,23 @@ public:
     {
         if (btn == Gosu::kbEscape) {
            close();
+        } else if (btn == Gosu::msLeft) {
+            auto mousePos = Position(input().mouseX(), input().mouseY());
+            auto nearest = graph.GetNearestNode(mousePos);
+            if (nearest) {
+                auto diff = std::abs(*nearest - mousePos);
+                if (diff.x < 10 && diff.y < 10) {
+                    grabbedNode = nearest;
+                }
+            }
+        }
+    }
+    
+    void buttonUp(Gosu::Button btn)
+    {
+        if (btn == Gosu::msLeft) {
+            // release any currently dragged node
+            grabbedNode.clear();
         }
     }
 };
