@@ -114,6 +114,17 @@ public:
     
 };
 
+// finish recursion
+void drawLine(Gosu::Graphics&, Gosu::Color, double, Position){}
+
+template<typename T, typename... Args>
+void drawLine(Gosu::Graphics& g, Gosu::Color col, double z, T pos, T pos2, Args... args)
+{
+    static_assert(std::is_same<T, Position>::value, "drawLine can only be used with Position elements");
+    g.drawLine(pos.x, pos.y, col, pos2.x, pos2.y, col, z);
+    drawLine(g, col, z, pos2, args...);
+}
+
 class Graph
 {
     static const size_t max_nodes = 100;
@@ -174,18 +185,18 @@ public:
             if (!node) continue;
             double wdt = 10;
             double hgt = 10;
-            g.drawQuad(
-                node->x - wdt, node->y - wdt, Gosu::Color::RED,
-                node->x + wdt, node->y - wdt, Gosu::Color::RED,
-                node->x + wdt, node->y + wdt, Gosu::Color::RED,
-                node->x - wdt, node->y + wdt, Gosu::Color::RED,
-                zUI
+            drawLine(g, Gosu::Color::RED, zGraph,
+                Position(node->x - wdt, node->y - wdt),
+                Position(node->x + wdt, node->y - wdt),
+                Position(node->x + wdt, node->y + wdt),
+                Position(node->x - wdt, node->y + wdt),
+                Position(node->x - wdt, node->y - wdt)
             );
             for (auto& edge: node->Edges()) {
                 g.drawLine(
                     node->x, node->y, Gosu::Color::BLUE,
                     edge->node().x, edge->node().y, Gosu::Color::BLUE,
-                    zUI
+                    zGraph
                 );
             }
         }
@@ -252,11 +263,12 @@ public:
     void draw()
     {
         graph.draw(graphics());
-        graphics().drawTriangle(
-            input().mouseX(), input().mouseY(), Gosu::Color::WHITE,
-            input().mouseX()+20, input().mouseY()+5, Gosu::Color::WHITE,
-            input().mouseX()+5, input().mouseY()+20, Gosu::Color::WHITE,
-            zUI
+        Position mousePos(input().mouseX(), input().mouseY());
+        drawLine(graphics(), Gosu::Color::WHITE, zUI,
+            mousePos,
+            mousePos + Position(20, 5),
+            mousePos + Position(5, 20),
+            mousePos
         );
         auto nearest = graph.GetNearestNode(Position(input().mouseX(), input().mouseY()));
         if (nearest) {
