@@ -100,6 +100,26 @@ public:
     :NodeCount(0)
     {
     }
+    
+    optional<Node&> GetNearestNode(double x, double y)
+    {
+        optional<Node&> found;
+        double dist;
+        for (auto& node:Nodes) {
+            if (!node) continue;
+            auto _dist = (x - node->x)*(x - node->x) + (y - node->y)*(y - node->y);
+            if (!found) {
+                found.emplace(*node);
+                dist = _dist;
+                continue;
+            }
+            if (_dist < dist) {
+                found.emplace(*node);
+                dist = _dist;
+            }
+        }
+        return found;
+    }
 
     Node& CreateNode(double x, double y)
     {
@@ -209,6 +229,14 @@ public:
             input().mouseX()+5, input().mouseY()+20, Gosu::Color::WHITE,
             zUI
         );
+        auto nearest = graph.GetNearestNode(input().mouseX(), input().mouseY());
+        if (nearest) {
+            graphics().drawLine(
+                input().mouseX(), input().mouseY(), Gosu::Color::GREEN,
+                nearest->x, nearest->y, Gosu::Color::GREEN,
+                zUI
+            );
+        }
     }
 
     void buttonDown(Gosu::Button btn)
