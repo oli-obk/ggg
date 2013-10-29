@@ -208,7 +208,7 @@ class GameWindow : public Gosu::Window
     Gosu::Font font;
     optional<Gosu::Image> img;
     Graph graph;
-    optional<Node&> grabbedNode;
+    optional<Node&> grabbedNode, connectingNode;
 public:
     GameWindow()
     :Window(640, 480, false)
@@ -270,14 +270,33 @@ public:
             mousePos + Position(5, 20),
             mousePos
         );
-        auto nearest = graph.GetNearestNode(Position(input().mouseX(), input().mouseY()));
-        if (nearest) {
+
+        if (connectingNode) {
+            // draw some sparkling green particles not signify a new edge that is being created
             graphics().drawLine(
                 input().mouseX(), input().mouseY(), Gosu::Color::GREEN,
-                nearest->x, nearest->y, Gosu::Color::GREEN,
+                connectingNode->x, connectingNode->y, Gosu::Color::GREEN,
                 zUI
             );
         }
+    }
+    
+    Position mousePosition() const
+    {
+        return Position(input().mouseX(), input().mouseY());
+    }
+    
+    optional<Node&> selectNode()
+    {
+        auto mousePos = mousePosition();
+        auto nearest = graph.GetNearestNode(mousePos);
+        if (nearest) {
+            auto diff = std::abs(*nearest - mousePos);
+            if (diff.x < 10 && diff.y < 10) {
+                return nearest;
+            }
+        }
+        return optional<Node&>();
     }
 
     void buttonDown(Gosu::Button btn)
@@ -285,13 +304,14 @@ public:
         if (btn == Gosu::kbEscape) {
            close();
         } else if (btn == Gosu::msLeft) {
-            auto mousePos = Position(input().mouseX(), input().mouseY());
-            auto nearest = graph.GetNearestNode(mousePos);
-            if (nearest) {
-                auto diff = std::abs(*nearest - mousePos);
-                if (diff.x < 10 && diff.y < 10) {
-                    grabbedNode = nearest;
-                }
+            auto selected = selectNode();
+            if (selected) {
+                grabbedNode = selected;
+            }
+        } else if (btn == Gosu::msRight) {
+            auto selected = selectNode();
+            if (selected) {
+                connectingNode = selected;
             }
         }
     }
@@ -301,6 +321,20 @@ public:
         if (btn == Gosu::msLeft) {
             // release any currently dragged node
             grabbedNode.clear();
+        } else if (btn == Gosu::kbSpace) {
+            auto selected = selectNode();
+            if (!selected) {
+                graph.CreateNode(mousePosition());
+            }
+        } else if (btn == Gosu::msRight) {
+            if (connectingNode) {
+                auto selected = selectNode();
+                if (selected) {
+                    selected->connect(*connectingNode);
+                }
+                // release edge
+                connectingNode.clear();
+            }
         }
     }
 };
