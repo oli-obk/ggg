@@ -278,7 +278,7 @@ public:
     void draw()
     {
         graph.draw(graphics());
-        Position mousePos(input().mouseX(), input().mouseY());
+        auto mousePos = mousePosition();
         drawLine(graphics(), Gosu::Color::WHITE, zUI,
             mousePos,
             mousePos + Position(20, 5),
@@ -288,8 +288,16 @@ public:
 
         if (connectingNode) {
             // draw some sparkling green particles not signify a new edge that is being created
+            Position targetPos;
+            auto selected = selectNode();
+            // snap to cursor && not to self && not to already connected nodes
+            if (selected && (*selected != *connectingNode) && !selected->connection(*connectingNode)) {
+                targetPos = *selected;
+            } else {
+                targetPos = mousePos;
+            }
             graphics().drawLine(
-                input().mouseX(), input().mouseY(), Gosu::Color::GREEN,
+                targetPos.x, targetPos.y, Gosu::Color::GREEN,
                 connectingNode->x, connectingNode->y, Gosu::Color::GREEN,
                 zUI
             );
