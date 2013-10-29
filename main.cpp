@@ -166,11 +166,15 @@ public:
                         );
         auto ctx = Cairo::Context::create(surface);
         
-        ctx->select_font_face("serif", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_BOLD);
-        ctx->set_font_size(32.0);
-        ctx->set_source_rgb(0.0, 0.0, 1.0);
-        ctx->move_to(10.0, 50.0);
-        ctx->show_text("Hello, world");
+        ctx->save();
+        {
+            ctx->select_font_face("serif", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_BOLD);
+            ctx->set_font_size(32.0);
+            ctx->set_source_rgb(0.0, 0.0, 1.0);
+            ctx->move_to(10.0, 50.0);
+            ctx->show_text("Hello, world");
+        }
+        ctx->restore();
         
         surface->flush();
         auto data = surface->get_data();
