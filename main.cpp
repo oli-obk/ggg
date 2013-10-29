@@ -58,6 +58,8 @@ class Edge
 private:
     Node* _node;
     Edge* _other;
+    Edge(const Edge&) = delete;
+    Edge& operator=(const Edge&) = delete;
 public:
     double weight;
     Edge(Node& node)
@@ -87,6 +89,8 @@ struct Node : public Position
 {
 private:
     std::vector<std::unique_ptr<Edge>> _edges;
+    Node(const Node&) = delete;
+    Node& operator=(const Node&) = delete;
 public:
     Node(Position pos = Position()):Position(pos){}
     
@@ -112,6 +116,15 @@ public:
         return true;
     }
     
+    bool operator==(const Node& rhs) const
+    {
+        return this == &rhs;
+    }
+    
+    bool operator!=(const Node& rhs) const
+    {
+        return this != &rhs;
+    }
 };
 
 // finish recursion
@@ -130,6 +143,8 @@ class Graph
     static const size_t max_nodes = 100;
     std::array<optional<Node>, max_nodes> Nodes;
     size_t NodeCount;
+    Graph(const Graph&) = delete;
+    Graph& operator=(const Graph&) = delete;
 public:
     Graph()
     :NodeCount(0)
