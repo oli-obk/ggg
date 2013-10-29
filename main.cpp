@@ -105,7 +105,7 @@ public:
     bool connect(Node& other)
     {
         if (connection(other)) return false;
-        auto edge = std::make_unique<Edge>(*this);
+        auto edge = std::make_unique<Edge>(other);
         auto edge2 = std::make_unique<Edge>(*this, *edge);
         _edges.push_back(std::move(edge));
         other._edges.push_back(std::move(edge2));
