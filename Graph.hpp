@@ -27,7 +27,7 @@ public:
     {
     }
     
-    const decltype(nodes)& getNodes() const noexcept { return nodes; }
+    std::vector<const Node*> getNodes() const noexcept;
     
     optional<Node&> getNearestNode(Position pos) noexcept;
 

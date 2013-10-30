@@ -56,3 +56,15 @@ size_t Graph::getEdgeCount() const noexcept
     assert((ret & 1) == 0);
     return ret>>1;
 }
+
+std::vector<const Node*> Graph::getNodes() const noexcept
+{
+    std::vector<const Node*> ret;
+    ret.reserve(nodeCount);
+    for (auto& node:nodes) {
+        if (!node) continue;
+        ret.push_back(&*node);
+    }
+    return ret;
+}
+
