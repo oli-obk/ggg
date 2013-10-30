@@ -57,24 +57,26 @@ class Edge
 {
 private:
     Node* _node;
-    Edge* _other;
     Edge(const Edge&) = delete;
     Edge& operator=(const Edge&) = delete;
 public:
     double weight;
-    Edge(Node& node)
+    explicit Edge(Node& node)
     :weight(0)
     ,_node(&node)
     {}
-    
-    Edge(Node& node, Edge& edge)
-    :Edge(node)
+
+    bool operator==(const Edge& rhs) const
     {
-        _other = &edge;
-        edge._other = this;
+        return this == &rhs;
     }
+    
+    bool operator!=(const Edge& rhs) const
+    {
+        return this != &rhs;
+    }
+    
     Node& node() { return *_node; }
-    Edge& other() { return *_other; }
 };
 
 namespace std {
@@ -88,22 +90,49 @@ namespace std {
 struct Node : public Position
 {
 private:
-    std::vector<std::unique_ptr<Edge>> _edges;
+    std::array<optional<Edge>, 10> _edges;
+    size_t num_edges;
     Node(const Node&) = delete;
     Node& operator=(const Node&) = delete;
     Node(Node&&) = delete;
     Node& operator=(Node&&) = delete;
 public:
     Node(Position pos = Position()):Position(pos){}
-    
-    const std::vector<std::unique_ptr<Edge>>& Edges() const { return _edges; }
-    
-    optional<Edge&> connection(Node& other) const
+    ~Node()
     {
         for (auto& edge:_edges) {
-            if (&edge->node() == &other) {
-                return optional<Edge&>(*edge);
+            if (!edge) continue;
+            bool success = false;
+            for (auto& e:edge->node()._edges) {
+                if (!e) continue;
+                if (e->node() != *this) continue;
+                e->node().num_edges--;
+                e.clear();
+                success = true;
+                break;
             }
+            assert(success);
+            edge.clear();
+        }
+    }
+    
+    std::vector<Edge*> Edges()
+    {
+        std::vector<Edge*> ret;
+        for (auto& edge:_edges) {
+            if (edge) {
+                ret.emplace_back(&*edge);
+            }
+        }
+        return ret;
+    }
+    
+    optional<Edge&> connection(Node& other)
+    {
+        for (auto& edge:_edges) {
+            if (!edge) continue;
+            if (edge->node() != other) continue;
+            return optional<Edge&>(*edge);
         }
         return optional<Edge&>();
     }
@@ -111,10 +140,30 @@ public:
     bool connect(Node& other)
     {
         if (connection(other)) return false;
-        auto edge = std::make_unique<Edge>(other);
-        auto edge2 = std::make_unique<Edge>(*this, *edge);
-        _edges.push_back(std::move(edge));
-        other._edges.push_back(std::move(edge2));
+        if (num_edges == _edges.size()) {
+            return false;
+        }
+        if (other.num_edges == _edges.size()) {
+            return false;
+        }
+        num_edges++;
+        other.num_edges++;
+        bool success = false;
+        for (auto& edge:_edges) {
+            if (edge) continue;
+            edge.emplace(std::ref(other));
+            success = true;
+            break;
+        }
+        assert(success);
+        success = false;
+        for (auto& edge:other._edges) {
+            if (edge) continue;
+            edge.emplace(std::ref(*this));
+            success = true;
+            break;
+        }
+        assert(success);
         return true;
     }
     
@@ -142,8 +191,7 @@ void drawLine(Gosu::Graphics& g, Gosu::Color col, double z, T pos, T pos2, Args.
 
 class Graph
 {
-    static const size_t max_nodes = 100;
-    std::array<optional<Node>, max_nodes> Nodes;
+    std::array<optional<Node>, 100> Nodes;
     size_t NodeCount;
     Graph(const Graph&) = delete;
     Graph& operator=(const Graph&) = delete;
@@ -187,7 +235,8 @@ public:
     void DeleteNode(Node& node)
     {
         for (auto& n:Nodes) {
-            if (&(*n) == &node) {
+            if (!n) continue;
+            if (*n == node) {
                 n.clear();
                 NodeCount--;
                 return;
@@ -350,6 +399,8 @@ public:
             auto selected = selectNode();
             if (!selected) {
                 graph.CreateNode(mousePosition());
+            } else {
+                graph.DeleteNode(*selected);
             }
         } else if (btn == Gosu::msRight) {
             if (connectingNode) {

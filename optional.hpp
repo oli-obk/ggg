@@ -161,7 +161,7 @@ public:
     optional() : value(nullptr) {}
     
     // initializer
-    explicit optional(const T3 _v) : value(&_v) {}
+    explicit optional(T3 _v) : value(&_v) {}
     
     // copy constructor
     optional(const optional& other)
