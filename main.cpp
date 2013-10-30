@@ -78,6 +78,7 @@ public:
     }
     
     Node& node() { return *_node; }
+    const Node& node() const { return *_node; }
 };
 
 namespace std {
@@ -120,6 +121,17 @@ public:
     std::vector<Edge*> Edges()
     {
         std::vector<Edge*> ret;
+        for (auto& edge:_edges) {
+            if (edge) {
+                ret.emplace_back(&*edge);
+            }
+        }
+        return ret;
+    }
+    
+    std::vector<const Edge*> Edges() const
+    {
+        std::vector<const Edge*> ret;
         for (auto& edge:_edges) {
             if (edge) {
                 ret.emplace_back(&*edge);
@@ -196,12 +208,13 @@ class Graph
     size_t NodeCount;
     Graph(const Graph&) = delete;
     Graph& operator=(const Graph&) = delete;
-    optional<Gosu::Image> NodeImage;
 public:
     Graph()
     :NodeCount(0)
     {
     }
+    
+    const decltype(Nodes)& GetNodes() const { return Nodes; }
     
     optional<Node&> GetNearestNode(Position pos)
     {
@@ -246,26 +259,6 @@ public:
         }
         throw std::runtime_error("unknown node");
     }
-    
-    void draw(Gosu::Graphics& g)
-    {
-        if (!NodeImage) {
-            NodeImage.emplace(std::ref(g), L"node.png", true);
-        }
-        for (auto& node:Nodes) {
-            if (!node) continue;
-            double wdt = 10;
-            double hgt = 10;
-            NodeImage->draw(node->x-10, node->y-10, zNodes, 1, 1, Gosu::Color::RED);
-            for (auto& edge: node->Edges()) {
-                g.drawLine(
-                    node->x, node->y, Gosu::Color::BLUE,
-                    edge->node().x, edge->node().y, Gosu::Color::BLUE,
-                    zEdges
-                );
-            }
-        }
-    }
 };
 
 class GameWindow : public Gosu::Window
@@ -274,10 +267,12 @@ class GameWindow : public Gosu::Window
     optional<Gosu::Image> img;
     Graph graph;
     optional<Node&> grabbedNode, connectingNode;
+    Gosu::Image NodeImage;
 public:
     GameWindow()
     :Window(640, 480, false)
     ,font(graphics(), Gosu::defaultFontName(), 20)
+    ,NodeImage(graphics(), L"node.png", true)
     {
         setCaption(L"GraphGame");
         auto surface = Cairo::ImageSurface::create(
@@ -327,7 +322,19 @@ public:
 
     void draw()
     {
-        graph.draw(graphics());
+        for (auto& node:graph.GetNodes()) {
+            if (!node) continue;
+            double wdt = 10;
+            double hgt = 10;
+            NodeImage.draw(node->x-10, node->y-10, zNodes, 1, 1, Gosu::Color::RED);
+            for (auto& edge: node->Edges()) {
+                graphics().drawLine(
+                    node->x, node->y, Gosu::Color::BLUE,
+                    edge->node().x, edge->node().y, Gosu::Color::BLUE,
+                    zEdges
+                );
+            }
+        }
         auto mousePos = mousePosition();
         drawLine(graphics(), Gosu::Color::WHITE, zUI,
             mousePos,
