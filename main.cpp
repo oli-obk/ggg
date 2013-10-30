@@ -42,12 +42,12 @@ class GameWindow : public Gosu::Window
     optional<Gosu::Image> img;
     Graph graph;
     optional<Node&> grabbedNode, connectingNode;
-    Gosu::Image NodeImage;
+    Gosu::Image nodeImage;
 public:
     GameWindow()
     :Window(640, 480, false)
     ,font(graphics(), Gosu::defaultFontName(), 20)
-    ,NodeImage(graphics(), L"node.png", true)
+    ,nodeImage(graphics(), L"node.png", true)
     {
         setCaption(L"GraphGame");
         auto surface = Cairo::ImageSurface::create(
@@ -82,8 +82,8 @@ public:
         }
         img.emplace(std::ref(graphics()), bmp);
         
-        auto& node = graph.CreateNode(Position(100, 100));
-        auto& node2 = graph.CreateNode(Position(150, 200));
+        auto& node = graph.createNode(Position(100, 100));
+        auto& node2 = graph.createNode(Position(150, 200));
         node.connect(node2);
     }
 
@@ -97,15 +97,15 @@ public:
 
     void draw()
     {
-        for (auto& node:graph.GetNodes()) {
+        for (auto& node:graph.getNodes()) {
             if (!node) continue;
             double wdt = 10;
             double hgt = 10;
-            NodeImage.draw(node->x-10, node->y-10, zNodes, 1, 1, Gosu::Color::RED);
-            for (auto& edge: node->Edges()) {
+            nodeImage.draw(node->x-10, node->y-10, zNodes, 1, 1, Gosu::Color::RED);
+            for (auto& edge: node->getEdges()) {
                 graphics().drawLine(
                     node->x, node->y, Gosu::Color::BLUE,
-                    edge->node().x, edge->node().y, Gosu::Color::BLUE,
+                    edge->getNode().x, edge->getNode().y, Gosu::Color::BLUE,
                     zEdges
                 );
             }
@@ -123,7 +123,7 @@ public:
             Position targetPos;
             auto selected = selectNode();
             // snap to cursor && not to self && not to already connected nodes
-            if (selected && (*selected != *connectingNode) && !selected->connection(*connectingNode)) {
+            if (selected && (*selected != *connectingNode) && !selected->getConnection(*connectingNode)) {
                 targetPos = *selected;
             } else {
                 targetPos = mousePos;
@@ -144,7 +144,7 @@ public:
     optional<Node&> selectNode()
     {
         auto mousePos = mousePosition();
-        auto nearest = graph.GetNearestNode(mousePos);
+        auto nearest = graph.getNearestNode(mousePos);
         if (nearest) {
             auto diff = std::abs(*nearest - mousePos);
             if (diff.x < 10 && diff.y < 10) {
@@ -179,9 +179,9 @@ public:
         } else if (btn == Gosu::kbSpace) {
             auto selected = selectNode();
             if (!selected) {
-                graph.CreateNode(mousePosition());
+                graph.createNode(mousePosition());
             } else {
-                graph.DeleteNode(*selected);
+                graph.deleteNode(*selected);
             }
         } else if (btn == Gosu::msRight) {
             if (connectingNode) {

@@ -6,21 +6,21 @@ class Node;
 class Edge
 {
 private:
-    Node* _node;
+    Node* node;
     Edge(const Edge&) = delete;
     Edge& operator=(const Edge&) = delete;
 public:
     double weight;
     explicit Edge(Node& node)
     :weight(0)
-    ,_node(&node)
+    ,node(&node)
     {}
 
     bool operator==(const Edge& rhs) const { return this == &rhs; }
     bool operator!=(const Edge& rhs) const { return this != &rhs; }
     
-    Node& node() { return *_node; }
-    const Node& node() const { return *_node; }
+    Node& getNode() { return *node; }
+    const Node& getNode() const { return *node; }
 };
 
 #endif //GGG_EDGE_HPP

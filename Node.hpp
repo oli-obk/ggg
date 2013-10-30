@@ -10,7 +10,7 @@
 struct Node : public Position
 {
 private:
-    std::array<optional<Edge>, 10> _edges;
+    std::array<optional<Edge>, 10> edges;
     size_t num_edges;
     Node(const Node&) = delete;
     Node& operator=(const Node&) = delete;
@@ -22,11 +22,11 @@ public:
     
     ~Node();
     
-    std::vector<Edge*> Edges() noexcept;
+    std::vector<Edge*> getEdges() noexcept;
     
-    std::vector<const Edge*> Edges() const noexcept;
+    std::vector<const Edge*> getEdges() const noexcept;
     
-    optional<Edge&> connection(Node& other) noexcept;
+    optional<Edge&> getConnection(Node& other) noexcept;
     
     bool connect(Node& other) noexcept;
     

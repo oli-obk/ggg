@@ -1,10 +1,10 @@
 #include "Graph.hpp"
 
-optional<Node&> Graph::GetNearestNode(Position pos) noexcept
+optional<Node&> Graph::getNearestNode(Position pos) noexcept
 {
     optional<Node&> found;
     double dist;
-    for (auto& node:Nodes) {
+    for (auto& node:nodes) {
         if (!node) continue;
         auto _dist = pos.distanceSquared(*node);
         if (!found) {
@@ -21,24 +21,24 @@ optional<Node&> Graph::GetNearestNode(Position pos) noexcept
 }
 
 
-Node& Graph::CreateNode(Position pos)
+Node& Graph::createNode(Position pos)
 {
-    for (auto& node:Nodes) {
+    for (auto& node:nodes) {
         if (node) continue;
         node.emplace(pos);
-        NodeCount++;
+        nodeCount++;
         return *node;
     }
     throw TooManyNodesException("there are too many nodes already, increase the amount during compilation");
 }
 
-void Graph::DeleteNode(Node& node)
+void Graph::deleteNode(Node& node)
 {
-    for (auto& n:Nodes) {
+    for (auto& n:nodes) {
         if (!n) continue;
         if (*n == node) {
             n.clear();
-            NodeCount--;
+            nodeCount--;
             return;
         }
     }

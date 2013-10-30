@@ -3,13 +3,13 @@
 
 Node::~Node()
 {
-    for (auto& edge:_edges) {
+    for (auto& edge:edges) {
         if (!edge) continue;
         bool success = false;
-        for (auto& e:edge->node()._edges) {
+        for (auto& e:edge->getNode().edges) {
             if (!e) continue;
-            if (e->node() != *this) continue;
-            e->node().num_edges--;
+            if (e->getNode() != *this) continue;
+            e->getNode().num_edges--;
             e.clear();
             success = true;
             break;
@@ -19,10 +19,10 @@ Node::~Node()
     }
 }
 
-std::vector<Edge*> Node::Edges() noexcept
+std::vector<Edge*> Node::getEdges() noexcept
 {
     std::vector<Edge*> ret;
-    for (auto& edge:_edges) {
+    for (auto& edge:edges) {
         if (edge) {
             ret.emplace_back(&*edge);
         }
@@ -30,10 +30,10 @@ std::vector<Edge*> Node::Edges() noexcept
     return ret;
 }
 
-std::vector<const Edge*> Node::Edges() const noexcept
+std::vector<const Edge*> Node::getEdges() const noexcept
 {
     std::vector<const Edge*> ret;
-    for (auto& edge:_edges) {
+    for (auto& edge:edges) {
         if (edge) {
             ret.emplace_back(&*edge);
         }
@@ -41,11 +41,11 @@ std::vector<const Edge*> Node::Edges() const noexcept
     return ret;
 }
 
-optional<Edge&> Node::connection(Node& other) noexcept
+optional<Edge&> Node::getConnection(Node& other) noexcept
 {
-    for (auto& edge:_edges) {
+    for (auto& edge:edges) {
         if (!edge) continue;
-        if (edge->node() != other) continue;
+        if (edge->getNode() != other) continue;
         return optional<Edge&>(*edge);
     }
     return optional<Edge&>();
@@ -53,17 +53,17 @@ optional<Edge&> Node::connection(Node& other) noexcept
 
 bool Node::connect(Node& other) noexcept
 {
-    if (connection(other)) return false;
-    if (num_edges == _edges.size()) {
+    if (getConnection(other)) return false;
+    if (num_edges == edges.size()) {
         return false;
     }
-    if (other.num_edges == _edges.size()) {
+    if (other.num_edges == other.edges.size()) {
         return false;
     }
     num_edges++;
     other.num_edges++;
     bool success = false;
-    for (auto& edge:_edges) {
+    for (auto& edge:edges) {
         if (edge) continue;
         edge.emplace(std::ref(other));
         success = true;
@@ -71,7 +71,7 @@ bool Node::connect(Node& other) noexcept
     }
     assert(success);
     success = false;
-    for (auto& edge:other._edges) {
+    for (auto& edge:other.edges) {
         if (edge) continue;
         edge.emplace(std::ref(*this));
         success = true;

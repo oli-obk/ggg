@@ -15,27 +15,27 @@ public:
 
 class Graph
 {
-    std::array<optional<Node>, 100> Nodes;
-    size_t NodeCount;
+    std::array<optional<Node>, 100> nodes;
+    size_t nodeCount;
     Graph(const Graph&) = delete;
     Graph& operator=(const Graph&) = delete;
     Graph(Graph&&) = delete;
     Graph& operator=(Graph&&) = delete;
 public:
     Graph()
-    :NodeCount(0)
+    :nodeCount(0)
     {
     }
     
-    const decltype(Nodes)& GetNodes() const noexcept { return Nodes; }
+    const decltype(nodes)& getNodes() const noexcept { return nodes; }
     
-    optional<Node&> GetNearestNode(Position pos) noexcept;
+    optional<Node&> getNearestNode(Position pos) noexcept;
 
     // throws a TooManyNodesException if there are already 100 nodes
-    Node& CreateNode(Position pos);
+    Node& createNode(Position pos);
     
-    const size_t GetNodeCount() const noexcept { return NodeCount; }
+    const size_t getNodeCount() const noexcept { return nodeCount; }
 
     // throws an UnknownNodeException if the node is not handled by this graph
-    void DeleteNode(Node& node);
+    void deleteNode(Node& node);
 };
