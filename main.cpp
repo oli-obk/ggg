@@ -187,7 +187,10 @@ public:
             if (connectingNode) {
                 auto selected = selectNode();
                 if (selected) {
-                    selected->connect(*connectingNode);
+                    // check for a connection first
+                    if (!selected->getEdge(*connectingNode)) {
+                        selected->connect(*connectingNode);
+                    }
                 }
                 // release edge
                 connectingNode.clear();
