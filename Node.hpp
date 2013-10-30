@@ -3,9 +3,10 @@
 
 #include "Edge.hpp"
 #include "Position.hpp"
-#include <array>
+#include <vector>
 #include "optional.hpp"
 #include <vector>
+#include <memory>
 
 class NodesAlreadyConnectedException : public std::runtime_error
 {
@@ -22,8 +23,7 @@ public:
 class Node : public Position
 {
 private:
-    std::array<optional<Edge>, 10> edges;
-    size_t num_edges;
+    std::vector<std::unique_ptr<Edge>> edges;
     Node(const Node&) = delete;
     Node& operator=(const Node&) = delete;
     Node(Node&&) = delete;
@@ -34,7 +34,7 @@ public:
     
     ~Node();
     
-    size_t getEdgeCount() const noexcept { return num_edges; }
+    size_t getEdgeCount() const noexcept { return edges.size(); }
     
     std::vector<Edge*> getEdges() noexcept;
     

@@ -1,5 +1,6 @@
 #include "Node.hpp"
 #include "Edge.hpp"
+#include <memory>
 
 class TooManyNodesException : public std::runtime_error
 {
@@ -13,28 +14,30 @@ public:
     using std::runtime_error::runtime_error;
 };
 
+class ThereAreNoNodesException : public std::runtime_error
+{
+public:
+    using std::runtime_error::runtime_error;
+};
+
 class Graph
 {
-    std::array<optional<Node>, 100> nodes;
-    size_t nodeCount;
+    std::vector<std::unique_ptr<Node>> nodes;
     Graph(const Graph&) = delete;
     Graph& operator=(const Graph&) = delete;
     Graph(Graph&&) = delete;
     Graph& operator=(Graph&&) = delete;
 public:
-    Graph()
-    :nodeCount(0)
-    {
-    }
+    Graph() = default;
     
     std::vector<const Node*> getNodes() const noexcept;
     
-    optional<Node&> getNearestNode(Position pos) noexcept;
+    Node& getNearestNode(Position pos);
 
     // throws a TooManyNodesException if there are already 100 nodes
     Node& createNode(Position pos);
     
-    const size_t getNodeCount() const noexcept { return nodeCount; }
+    size_t getNodeCount() const noexcept { return nodes.size(); }
 
     // throws an UnknownNodeException if the node is not handled by this graph
     void deleteNode(Node& node);

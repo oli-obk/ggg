@@ -98,9 +98,6 @@ public:
     void draw() noexcept override
     {
         for (auto& node:graph.getNodes()) {
-            if (!node) continue;
-            double wdt = 10;
-            double hgt = 10;
             nodeImage.draw(node->x-10, node->y-10, zNodes, 1, 1, Gosu::Color::RED);
             for (auto& edge: node->getEdges()) {
                 graphics().drawLine(
@@ -146,13 +143,12 @@ public:
     
     optional<Node&> selectNode() noexcept
     {
+        if (graph.getNodeCount() == 0) return optional<Node&>();
         auto mousePos = mousePosition();
-        auto nearest = graph.getNearestNode(mousePos);
-        if (nearest) {
-            auto diff = std::abs(*nearest - mousePos);
-            if (diff.x < 10 && diff.y < 10) {
-                return nearest;
-            }
+        auto& nearest = graph.getNearestNode(mousePos);
+        auto diff = std::abs(nearest - mousePos);
+        if (diff.x < 10 && diff.y < 10) {
+            return optional<Node&>(nearest);
         }
         return optional<Node&>();
     }

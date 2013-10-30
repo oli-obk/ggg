@@ -1,44 +1,38 @@
 #include "Graph.hpp"
+#include "make_unique.hpp"
+#include <limits>
 
-optional<Node&> Graph::getNearestNode(Position pos) noexcept
+Node& Graph::getNearestNode(Position pos)
 {
-    optional<Node&> found;
-    double dist;
+    if (nodes.empty()) {
+        throw ThereAreNoNodesException("can't get nearest node without any nodes");
+    }
+    Node* found;
+    double dist = std::numeric_limits<double>::max();
     for (auto& node:nodes) {
-        if (!node) continue;
         auto _dist = pos.distanceSquared(*node);
-        if (!found) {
-            found.emplace(*node);
-            dist = _dist;
-            continue;
-        }
         if (_dist < dist) {
-            found.emplace(*node);
+            found = node.get();
             dist = _dist;
         }
     }
-    return found;
+    assert(found);
+    return *found;
 }
 
 
 Node& Graph::createNode(Position pos)
 {
-    for (auto& node:nodes) {
-        if (node) continue;
-        node.emplace(pos);
-        nodeCount++;
-        return *node;
-    }
-    throw TooManyNodesException("there are too many nodes already, increase the amount during compilation");
+    nodes.push_back(std::make_unique<Node>(pos));
+    return *nodes.back();
 }
 
 void Graph::deleteNode(Node& node)
 {
     for (auto& n:nodes) {
-        if (!n) continue;
         if (*n == node) {
-            n.clear();
-            nodeCount--;
+            n = std::move(nodes.back());
+            nodes.pop_back();
             return;
         }
     }
@@ -49,7 +43,6 @@ size_t Graph::getEdgeCount() const noexcept
 {
     size_t ret;
     for (auto& node:nodes) {
-        if (!node) continue;
         ret += node -> getEdgeCount();
     }
     // divisible by 2? we are getting double edge count
@@ -60,10 +53,9 @@ size_t Graph::getEdgeCount() const noexcept
 std::vector<const Node*> Graph::getNodes() const noexcept
 {
     std::vector<const Node*> ret;
-    ret.reserve(nodeCount);
+    ret.reserve(nodes.size());
     for (auto& node:nodes) {
-        if (!node) continue;
-        ret.push_back(&*node);
+        ret.push_back(node.get());
     }
     return ret;
 }
