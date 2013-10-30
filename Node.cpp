@@ -41,7 +41,7 @@ std::vector<const Edge*> Node::getEdges() const noexcept
     return ret;
 }
 
-optional<Edge&> Node::getConnection(Node& other) noexcept
+optional<Edge&> Node::getEdge(Node& other) noexcept
 {
     for (auto& edge:edges) {
         if (!edge) continue;
@@ -53,7 +53,7 @@ optional<Edge&> Node::getConnection(Node& other) noexcept
 
 bool Node::connect(Node& other) noexcept
 {
-    if (getConnection(other)) return false;
+    if (getEdge(other)) return false;
     if (num_edges == edges.size()) {
         return false;
     }

@@ -123,7 +123,7 @@ public:
             Position targetPos;
             auto selected = selectNode();
             // snap to cursor && not to self && not to already connected nodes
-            if (selected && (*selected != *connectingNode) && !selected->getConnection(*connectingNode)) {
+            if (selected && (*selected != *connectingNode) && !selected->getEdge(*connectingNode)) {
                 targetPos = *selected;
             } else {
                 targetPos = mousePos;

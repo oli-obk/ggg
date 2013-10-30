@@ -26,7 +26,7 @@ public:
     
     std::vector<const Edge*> getEdges() const noexcept;
     
-    optional<Edge&> getConnection(Node& other) noexcept;
+    optional<Edge&> getEdge(Node& other) noexcept;
     
     bool connect(Node& other) noexcept;
     
