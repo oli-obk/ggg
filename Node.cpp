@@ -19,7 +19,7 @@ Node::~Node()
     }
 }
 
-std::vector<Edge*> Node::Edges()
+std::vector<Edge*> Node::Edges() noexcept
 {
     std::vector<Edge*> ret;
     for (auto& edge:_edges) {
@@ -30,7 +30,7 @@ std::vector<Edge*> Node::Edges()
     return ret;
 }
 
-std::vector<const Edge*> Node::Edges() const
+std::vector<const Edge*> Node::Edges() const noexcept
 {
     std::vector<const Edge*> ret;
     for (auto& edge:_edges) {
@@ -41,7 +41,7 @@ std::vector<const Edge*> Node::Edges() const
     return ret;
 }
 
-optional<Edge&> Node::connection(Node& other)
+optional<Edge&> Node::connection(Node& other) noexcept
 {
     for (auto& edge:_edges) {
         if (!edge) continue;
@@ -51,7 +51,7 @@ optional<Edge&> Node::connection(Node& other)
     return optional<Edge&>();
 }
 
-bool Node::connect(Node& other)
+bool Node::connect(Node& other) noexcept
 {
     if (connection(other)) return false;
     if (num_edges == _edges.size()) {

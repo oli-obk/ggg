@@ -17,23 +17,25 @@ private:
     Node(Node&&) = delete;
     Node& operator=(Node&&) = delete;
 public:
-    Node(Position pos = Position()):Position(pos){}
+    Node(Position pos = Position()) noexcept
+    :Position(pos){}
+    
     ~Node();
     
-    std::vector<Edge*> Edges();
+    std::vector<Edge*> Edges() noexcept;
     
-    std::vector<const Edge*> Edges() const;
+    std::vector<const Edge*> Edges() const noexcept;
     
-    optional<Edge&> connection(Node& other);
+    optional<Edge&> connection(Node& other) noexcept;
     
-    bool connect(Node& other);
+    bool connect(Node& other) noexcept;
     
-    bool operator==(const Node& rhs) const
+    bool operator==(const Node& rhs) const noexcept
     {
         return this == &rhs;
     }
     
-    bool operator!=(const Node& rhs) const
+    bool operator!=(const Node& rhs) const noexcept
     {
         return this != &rhs;
     }
