@@ -5,6 +5,8 @@ PROJECT(GraphGame)
 #Projects source files
 SET(SRC_FILES
 	main.cpp
+	Node.cpp
+	Graph.cpp
 	)
 
 #Projects headers files	
