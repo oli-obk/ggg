@@ -18,7 +18,8 @@
 enum ZOrder
 {
     zBackground,
-    zGraph,
+    zEdges,
+    zNodes,
     zUI
 };
 
@@ -195,6 +196,7 @@ class Graph
     size_t NodeCount;
     Graph(const Graph&) = delete;
     Graph& operator=(const Graph&) = delete;
+    optional<Gosu::Image> NodeImage;
 public:
     Graph()
     :NodeCount(0)
@@ -247,22 +249,19 @@ public:
     
     void draw(Gosu::Graphics& g)
     {
+        if (!NodeImage) {
+            NodeImage.emplace(std::ref(g), L"node.png", true);
+        }
         for (auto& node:Nodes) {
             if (!node) continue;
             double wdt = 10;
             double hgt = 10;
-            drawLine(g, Gosu::Color::RED, zGraph,
-                Position(node->x - wdt, node->y - wdt),
-                Position(node->x + wdt, node->y - wdt),
-                Position(node->x + wdt, node->y + wdt),
-                Position(node->x - wdt, node->y + wdt),
-                Position(node->x - wdt, node->y - wdt)
-            );
+            NodeImage->draw(node->x-10, node->y-10, zNodes, 1, 1, Gosu::Color::RED);
             for (auto& edge: node->Edges()) {
                 g.drawLine(
                     node->x, node->y, Gosu::Color::BLUE,
                     edge->node().x, edge->node().y, Gosu::Color::BLUE,
-                    zGraph
+                    zEdges
                 );
             }
         }
