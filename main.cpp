@@ -87,7 +87,7 @@ public:
         node.connect(node2);
     }
 
-    void update()
+    void update() noexcept override
     {
         if (grabbedNode) {
             grabbedNode->x = input().mouseX();
@@ -95,7 +95,7 @@ public:
         }
     }
 
-    void draw()
+    void draw() noexcept override
     {
         for (auto& node:graph.getNodes()) {
             if (!node) continue;
@@ -136,12 +136,12 @@ public:
         }
     }
     
-    Position mousePosition() const
+    Position mousePosition() const noexcept
     {
         return Position(input().mouseX(), input().mouseY());
     }
     
-    optional<Node&> selectNode()
+    optional<Node&> selectNode() noexcept
     {
         auto mousePos = mousePosition();
         auto nearest = graph.getNearestNode(mousePos);
@@ -154,7 +154,7 @@ public:
         return optional<Node&>();
     }
 
-    void buttonDown(Gosu::Button btn)
+    void buttonDown(Gosu::Button btn) noexcept override
     {
         if (btn == Gosu::kbEscape) {
            close();
@@ -171,7 +171,7 @@ public:
         }
     }
     
-    void buttonUp(Gosu::Button btn)
+    void buttonUp(Gosu::Button btn) noexcept override
     {
         if (btn == Gosu::msLeft) {
             // release any currently dragged node
