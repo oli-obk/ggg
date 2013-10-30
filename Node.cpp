@@ -1,15 +1,17 @@
 #include "Node.hpp"
 #include <functional>
 #include "make_unique.hpp"
+#include <cassert>
 
 Node::~Node()
 {
     for (auto& edge:edges) {
         bool success = false;
-        for (auto& e:edge->getNode().edges) {
-            if (e->getNode() != *this) continue;
-            e = std::move(edge->getNode().edges.back());
-            edge->getNode().edges.pop_back();
+        auto& other_edges = edge->getTarget()->edges;
+        for (auto& e:other_edges) {
+            if (e->getTarget() != this) continue;
+            e = std::move(other_edges.back());
+            other_edges.pop_back();
             success = true;
             break;
         }
@@ -17,39 +19,40 @@ Node::~Node()
     }
 }
 
-std::vector<Edge*> Node::getEdges() noexcept
+std::vector<unmanaged_ptr<Edge>> Node::getEdges() noexcept
 {
-    std::vector<Edge*> ret;
+    std::vector<unmanaged_ptr<Edge>> ret;
     for (auto& edge:edges) {
         ret.push_back(edge.get());
     }
     return ret;
 }
 
-std::vector<const Edge*> Node::getEdges() const noexcept
+std::vector<unmanaged_ptr<const Edge>> Node::getEdges() const noexcept
 {
-    std::vector<const Edge*> ret;
+    std::vector<unmanaged_ptr<const Edge>> ret;
     for (auto& edge:edges) {
         ret.push_back(edge.get());
     }
     return ret;
 }
 
-optional<Edge&> Node::getEdge(Node& other) noexcept
+unmanaged_ptr<Edge> Node::getEdge(unmanaged_ptr<Node> other) noexcept
 {
     for (auto& edge:edges) {
-        if (edge->getNode() != other) continue;
-        return optional<Edge&>(*edge);
+        if (edge->getTarget() != other) continue;
+        return edge.get();
     }
-    return optional<Edge&>();
+    return nullptr;
 }
 
-Edge& Node::connect(Node& other)
+unmanaged_ptr<Edge> Node::connect(unmanaged_ptr<Node> other)
 {
     if (getEdge(other)) throw NodesAlreadyConnectedException("there is already an edge");
-    Edge* ret;
-    edges.push_back(std::make_unique<Edge>(std::ref(other)));
-    other.edges.push_back(std::make_unique<Edge>(std::ref(*this)));
-    return *ret;
+    // create edge from here to there
+    edges.push_back(std::make_unique<Edge>(this, other));
+    // and the other direction
+    other->edges.push_back(std::make_unique<Edge>(other, this));
+    return edges.back().get();
 }
 

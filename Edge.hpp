@@ -1,24 +1,28 @@
 #ifndef GGG_EDGE_HPP
 #define GGG_EDGE_HPP
 
+#include "unmanaged_ptr.hpp"
+
 class Node;
 
 class Edge
 {
 private:
-    Node* node;
+    const unmanaged_ptr<Node> source, target;
     Edge(const Edge&) = delete;
     Edge& operator=(const Edge&) = delete;
+    Edge(Edge&&) = delete;
+    Edge& operator=(Edge&&) = delete;
 public:
-    explicit Edge(Node& node)
-    :node(&node)
+    explicit Edge(unmanaged_ptr<Node> source, unmanaged_ptr<Node> target)
+    :source(source)
+    ,target(target)
     {}
-
-    bool operator==(const Edge& rhs) const { return this == &rhs; }
-    bool operator!=(const Edge& rhs) const { return this != &rhs; }
     
-    Node& getNode() { return *node; }
-    const Node& getNode() const { return *node; }
+    unmanaged_ptr<Node> getSource() { return source; }
+    unmanaged_ptr<const Node> getSource() const { return source; }
+    unmanaged_ptr<Node> getTarget() { return target; }
+    unmanaged_ptr<const Node> getTarget() const { return target; }
 };
 
 #endif //GGG_EDGE_HPP

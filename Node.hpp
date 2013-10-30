@@ -4,9 +4,8 @@
 #include "Edge.hpp"
 #include "Position.hpp"
 #include <vector>
-#include "optional.hpp"
-#include <vector>
 #include <memory>
+#include "unmanaged_ptr.hpp"
 
 class NodesAlreadyConnectedException : public std::runtime_error
 {
@@ -36,23 +35,13 @@ public:
     
     size_t getEdgeCount() const noexcept { return edges.size(); }
     
-    std::vector<Edge*> getEdges() noexcept;
+    std::vector<unmanaged_ptr<Edge>> getEdges() noexcept;
     
-    std::vector<const Edge*> getEdges() const noexcept;
+    std::vector<unmanaged_ptr<const Edge>> getEdges() const noexcept;
     
-    optional<Edge&> getEdge(Node& other) noexcept;
+    unmanaged_ptr<Edge> getEdge(unmanaged_ptr<Node> other) noexcept;
     
-    Edge& connect(Node& other);
-    
-    bool operator==(const Node& rhs) const noexcept
-    {
-        return this == &rhs;
-    }
-    
-    bool operator!=(const Node& rhs) const noexcept
-    {
-        return this != &rhs;
-    }
+    unmanaged_ptr<Edge> connect(unmanaged_ptr<Node> other);
 };
 
 #endif //GGG_NODE_HPP

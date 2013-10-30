@@ -14,6 +14,7 @@
 
 #include <cairomm/cairomm.h>
 #include "optional.hpp"
+#include "unmanaged_ptr.hpp"
 
 #include "Graph.hpp"
 
@@ -41,7 +42,7 @@ class GameWindow : public Gosu::Window
     Gosu::Font font;
     optional<Gosu::Image> img;
     Graph graph;
-    optional<Node&> grabbedNode, connectingNode;
+    unmanaged_ptr<Node> grabbedNode, connectingNode;
     Gosu::Image nodeImage;
 public:
     GameWindow()
@@ -82,9 +83,9 @@ public:
         }
         img.emplace(std::ref(graphics()), bmp);
         
-        auto& node = graph.createNode(Position(100, 100));
-        auto& node2 = graph.createNode(Position(150, 200));
-        node.connect(node2);
+        auto node = graph.createNode(Position(100, 100));
+        auto node2 = graph.createNode(Position(150, 200));
+        node->connect(node2);
     }
 
     void update() noexcept override
@@ -102,7 +103,7 @@ public:
             for (auto& edge: node->getEdges()) {
                 graphics().drawLine(
                     node->x, node->y, Gosu::Color::BLUE,
-                    edge->getNode().x, edge->getNode().y, Gosu::Color::BLUE,
+                    edge->getTarget()->x, edge->getTarget()->y, Gosu::Color::BLUE,
                     zEdges
                 );
             }
@@ -120,7 +121,7 @@ public:
             Position targetPos;
             auto selected = selectNode();
             // snap to cursor && not to self && not to already connected nodes
-            if (selected && (*selected != *connectingNode) && !selected->getEdge(*connectingNode)) {
+            if (selected && (selected != connectingNode) && !selected->getEdge(connectingNode)) {
                 targetPos = *selected;
             } else {
                 targetPos = mousePos;
@@ -141,16 +142,16 @@ public:
         return Position(input().mouseX(), input().mouseY());
     }
     
-    optional<Node&> selectNode() noexcept
+    unmanaged_ptr<Node> selectNode() noexcept
     {
-        if (graph.getNodeCount() == 0) return optional<Node&>();
+        if (graph.getNodeCount() == 0) return nullptr;
         auto mousePos = mousePosition();
-        auto& nearest = graph.getNearestNode(mousePos);
-        auto diff = std::abs(nearest - mousePos);
+        auto nearest = graph.getNearestNode(mousePos);
+        auto diff = std::abs(*nearest - mousePos);
         if (diff.x < 10 && diff.y < 10) {
-            return optional<Node&>(nearest);
+            return nearest;
         }
-        return optional<Node&>();
+        return nullptr;
     }
 
     void buttonDown(Gosu::Button btn) noexcept override
@@ -180,15 +181,15 @@ public:
             if (!selected) {
                 graph.createNode(mousePosition());
             } else {
-                graph.deleteNode(*selected);
+                graph.deleteNode(selected);
             }
         } else if (btn == Gosu::msRight) {
             if (connectingNode) {
                 auto selected = selectNode();
                 if (selected) {
                     // check for a connection first
-                    if (!selected->getEdge(*connectingNode)) {
-                        selected->connect(*connectingNode);
+                    if (!selected->getEdge(connectingNode)) {
+                        selected->connect(connectingNode);
                     }
                 }
                 // release edge

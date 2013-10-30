@@ -1,36 +1,37 @@
 #include "Graph.hpp"
 #include "make_unique.hpp"
 #include <limits>
+#include <set>
 
-Node& Graph::getNearestNode(Position pos)
+unmanaged_ptr<Node> Graph::getNearestNode(Position pos) noexcept
 {
     if (nodes.empty()) {
         throw ThereAreNoNodesException("can't get nearest node without any nodes");
     }
-    Node* found;
+    unmanaged_ptr<Node> found;
     double dist = std::numeric_limits<double>::max();
     for (auto& node:nodes) {
         auto _dist = pos.distanceSquared(*node);
         if (_dist < dist) {
-            found = node.get();
+            found = node;
             dist = _dist;
         }
     }
     assert(found);
-    return *found;
+    return found;
 }
 
 
-Node& Graph::createNode(Position pos)
+unmanaged_ptr<Node> Graph::createNode(Position pos)
 {
     nodes.push_back(std::make_unique<Node>(pos));
-    return *nodes.back();
+    return nodes.back().get();
 }
 
-void Graph::deleteNode(Node& node)
+void Graph::deleteNode(unmanaged_ptr<Node> node)
 {
     for (auto& n:nodes) {
-        if (*n == node) {
+        if (n == node) {
             n = std::move(nodes.back());
             nodes.pop_back();
             return;
@@ -50,13 +51,32 @@ size_t Graph::getEdgeCount() const noexcept
     return ret>>1;
 }
 
-std::vector<const Node*> Graph::getNodes() const noexcept
+std::vector<unmanaged_ptr<const Node>> Graph::getNodes() const noexcept
 {
-    std::vector<const Node*> ret;
+    std::vector<unmanaged_ptr<const Node>> ret;
     ret.reserve(nodes.size());
     for (auto& node:nodes) {
         ret.push_back(node.get());
     }
     return ret;
 }
+
+
+std::vector<unmanaged_ptr<const Edge>> Graph::getEdges() const noexcept
+{
+    std::vector<unmanaged_ptr<const Edge>> ret;
+    std::set<unmanaged_ptr<const Node>> processedNodes;
+    for (auto& node:nodes) {
+        for (auto edge:node->getEdges()) {
+            if (processedNodes.find(edge->getTarget()) != processedNodes.end()) {
+                // already have this edge
+                continue;
+            }
+            ret.push_back(edge);
+        }
+        processedNodes.insert(node.get());
+    }
+    return ret;
+}
+
 
