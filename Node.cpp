@@ -51,21 +51,23 @@ optional<Edge&> Node::getEdge(Node& other) noexcept
     return optional<Edge&>();
 }
 
-bool Node::connect(Node& other) noexcept
+Edge& Node::connect(Node& other)
 {
-    if (getEdge(other)) return false;
+    if (getEdge(other)) throw NodesAlreadyConnectedException("there is already an edge");
     if (num_edges == edges.size()) {
-        return false;
+        throw TooManyEdgesException("this node has too many edges");
     }
     if (other.num_edges == other.edges.size()) {
-        return false;
+        throw TooManyEdgesException("target node has too many edges");
     }
     num_edges++;
     other.num_edges++;
     bool success = false;
+    Edge* ret;
     for (auto& edge:edges) {
         if (edge) continue;
         edge.emplace(std::ref(other));
+        ret = &*edge;
         success = true;
         break;
     }
@@ -78,6 +80,6 @@ bool Node::connect(Node& other) noexcept
         break;
     }
     assert(success);
-    return true;
+    return *ret;
 }
 

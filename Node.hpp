@@ -7,6 +7,18 @@
 #include "optional.hpp"
 #include <vector>
 
+class NodesAlreadyConnectedException : public std::runtime_error
+{
+public:
+    using std::runtime_error::runtime_error;
+};
+
+class TooManyEdgesException : public std::runtime_error
+{
+public:
+    using std::runtime_error::runtime_error;
+};
+
 struct Node : public Position
 {
 private:
@@ -28,7 +40,7 @@ public:
     
     optional<Edge&> getEdge(Node& other) noexcept;
     
-    bool connect(Node& other) noexcept;
+    Edge& connect(Node& other);
     
     bool operator==(const Node& rhs) const noexcept
     {
