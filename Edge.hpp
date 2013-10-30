@@ -10,10 +10,8 @@ private:
     Edge(const Edge&) = delete;
     Edge& operator=(const Edge&) = delete;
 public:
-    double weight;
     explicit Edge(Node& node)
-    :weight(0)
-    ,node(&node)
+    :node(&node)
     {}
 
     bool operator==(const Edge& rhs) const { return this == &rhs; }
