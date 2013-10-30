@@ -134,6 +134,9 @@ public:
                 zUI
             );
         }
+        std::wstringstream wss;
+        wss << graph.getEdgeCount();
+        font.draw(wss.str().c_str(), 0, 0, 0);
     }
     
     Position mousePosition() const noexcept

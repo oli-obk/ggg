@@ -38,4 +38,6 @@ public:
 
     // throws an UnknownNodeException if the node is not handled by this graph
     void deleteNode(Node& node);
+    
+    size_t getEdgeCount() const noexcept;
 };

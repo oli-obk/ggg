@@ -44,3 +44,15 @@ void Graph::deleteNode(Node& node)
     }
     throw UnknownNodeException("tried to delete a node that does not belong to this graph");
 }
+
+size_t Graph::getEdgeCount() const noexcept
+{
+    size_t ret;
+    for (auto& node:nodes) {
+        if (!node) continue;
+        ret += node -> getEdgeCount();
+    }
+    // divisible by 2? we are getting double edge count
+    assert((ret & 1) == 0);
+    return ret>>1;
+}

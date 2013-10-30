@@ -19,7 +19,7 @@ public:
     using std::runtime_error::runtime_error;
 };
 
-struct Node : public Position
+class Node : public Position
 {
 private:
     std::array<optional<Edge>, 10> edges;
@@ -33,6 +33,8 @@ public:
     :Position(pos){}
     
     ~Node();
+    
+    size_t getEdgeCount() const noexcept { return num_edges; }
     
     std::vector<Edge*> getEdges() noexcept;
     
