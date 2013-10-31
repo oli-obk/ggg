@@ -138,7 +138,7 @@ public:
             font.draw(wss.str().c_str(), 0, 0, 0);
         }
         double y = 20;
-        for (auto edge:graph.getEdges()) {
+        for (auto edge:graph.getUndirectedEdges()) {
             std::wstringstream wss;
             wss << edge->getSource().get() << " -> " << edge->getTarget().get();
             font.draw(wss.str().c_str(), 0, y, 0);
