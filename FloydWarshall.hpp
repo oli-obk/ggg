@@ -10,6 +10,8 @@ public:
 	* Get the shortest path between nodes u and v.
 	*/
 	std::vector<NodePtr> getPath(NodePtr u, NodePtr v) const override;
+	
+	void printDistanceMatrix() const;
 
 private:
 	std::map<NodePtr, std::map<NodePtr, double> > dist;

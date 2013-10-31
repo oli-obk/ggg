@@ -234,6 +234,7 @@ public:
                     FloydWarshall fw;
                     fw.run(graph);
                     pathToDraw = fw.getPath(shortestDistSource, selected);
+                    fw.printDistanceMatrix();
                 }
                 // release edge
                 shortestDistSource.clear();

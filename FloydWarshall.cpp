@@ -1,6 +1,7 @@
 #import "FloydWarshall.hpp"
 #import "Node.hpp"
 #import "Edge.hpp"
+#import <iostream>
 
 void FloydWarshall::run(const Graph& g) {
 
@@ -27,6 +28,7 @@ void FloydWarshall::run(const Graph& g) {
 		NodePtr u = uv->getSource();
 		NodePtr v = uv->getTarget();
 		dist[u][v] = 1.0;
+		dist[v][u] = 1.0;
 	}
 
 	// main part of algorithm
@@ -63,3 +65,19 @@ std::vector<NodePtr> FloydWarshall::getPath(NodePtr u, NodePtr v) const {
 		return direct;
 	}
 }
+
+
+void FloydWarshall::printDistanceMatrix() const
+{
+    for (auto& x : dist) {
+        for (auto& y : x.second) {
+            if (y.second == inf) {
+                std::cout << "inf ";
+            } else {
+                std::cout << y.second << "\t";
+            }
+        }
+        std::cout << std::endl;
+    }
+}
+
