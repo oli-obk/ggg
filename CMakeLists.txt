@@ -13,6 +13,11 @@ SET(SRC_FILES
 
 #Projects headers files	
 SET(INC_FILES
+    Node.hpp
+    Graph.hpp
+    Edge.hpp
+    optional.hpp
+    unmanaged_ptr.hpp
 	)
 
 #"Sources" and "Headers" are the group names in Visual Studio.
