@@ -1,7 +1,4 @@
-#ifndef GGG_EDGE_HPP
-#define GGG_EDGE_HPP
-
-#include "unmanaged_ptr.hpp"
+#import "unmanaged_ptr.hpp"
 
 class Node;
 
@@ -24,5 +21,3 @@ public:
     unmanaged_ptr<Node> getTarget() { return target; }
     unmanaged_ptr<const Node> getTarget() const { return target; }
 };
-
-#endif //GGG_EDGE_HPP

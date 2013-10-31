@@ -1,22 +1,22 @@
 // All of Gosu.
-#include <Gosu/Gosu.hpp>
-// To safely include std::tr1::shared_ptr
-#include <Gosu/TR1.hpp> 
+#import <Gosu/Gosu.hpp>
+// To safely import std::tr1::shared_ptr
+#import <Gosu/TR1.hpp> 
 // Makes life easier for Windows users compiling this.
-#include <Gosu/AutoLink.hpp>
+#import <Gosu/AutoLink.hpp>
 
-#include <cmath>
-#include <cstdlib>
-#include <list>
-#include <memory>
-#include <sstream> // For int <-> string conversion
-#include <vector>
+#import <cmath>
+#import <cstdlib>
+#import <list>
+#import <memory>
+#import <sstream> // For int <-> string conversion
+#import <vector>
 
-#include <cairomm/cairomm.h>
-#include "optional.hpp"
-#include "unmanaged_ptr.hpp"
+#import <cairomm/cairomm.h>
+#import "optional.hpp"
+#import "unmanaged_ptr.hpp"
 
-#include "Graph.hpp"
+#import "Graph.hpp"
 
 enum ZOrder
 {

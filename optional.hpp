@@ -1,12 +1,10 @@
 /*
  * taken from http://stackoverflow.com/questions/11875045/implementing-boostoptional-in-c11
  */
-#ifndef OPTIONAL_HPP
-#define OPTIONAL_HPP
-#include <exception>
-#include <array>
-#include <type_traits>
-#include <cassert>
+#import <exception>
+#import <array>
+#import <type_traits>
+#import <cassert>
 
 template<typename T, class Enable = void>
 class optional;
@@ -148,4 +146,3 @@ public:
         valid = false;
     }
 };
-#endif // OPTIONAL_HPP
