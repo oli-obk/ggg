@@ -1,6 +1,7 @@
 #import "FloydWarshall.hpp"
 #import "Node.hpp"
 #import "Edge.hpp"
+#import "Graph.hpp"
 #import <iostream>
 
 void FloydWarshall::run(const Graph& g) {
@@ -34,10 +35,19 @@ void FloydWarshall::run(const Graph& g) {
 	// main part of algorithm
 	for (auto k: g.getNodes()) {
 		for (auto i: g.getNodes()) {
+		    if (i == k) continue;
 			for (auto j: g.getNodes()) {
-				if (dist[i][k] + dist[k][j] < dist[i][j]) {
-					dist[i][j] = dist[i][k] + dist[k][j];
-					next[i][j] = k; // needed to reconstruct path
+			    if (i == j) continue;
+			    if (j == k) continue;
+			    auto d = dist[i][k] + dist[k][j];
+				if (d < dist[i][j]) {
+					dist[i][j] = d;
+					next[i][j].clear();
+					next[i][j].insert(k); // needed to reconstruct path
+				} else if (d == dist[i][j]) {
+				    if (!next[i][j].empty()) {
+				        next[i][j].insert(k);
+				    }
 				}
 			}
 		}
@@ -45,23 +55,37 @@ void FloydWarshall::run(const Graph& g) {
 
 }
 
-
-std::vector<NodePtr> FloydWarshall::getPath(NodePtr u, NodePtr v) const {
+std::vector<Path> FloydWarshall::getPath(NodePtr u, NodePtr v) const {
 	if (dist.at(u).at(v) == inf) {
-		std::vector<NodePtr> empty;
-		return empty;
-	} 
+		return std::vector<Path>();
+	}
+	
+	std::cout << std::endl;
+	for (auto u_ : next) {
+    	std::cout << u_.first.get() << std::endl;
+	    for (auto v_ : u_.second) {
+	        std::cout << "\t" << v_.first.get() << "\t";
+	        for (auto node : v_.second) {
+	            std::cout << "\t" << node.get();
+	        }
+	        std::cout << std::endl;
+	    }
+	}
 
 	try {
-		auto intermediate = next.at(u).at(v);
-		auto prefix = getPath(u, intermediate);
-		prefix.push_back(intermediate);
-		auto suffix = getPath(intermediate, v);
-		std::copy(std::begin(suffix), std::end(suffix), std::back_inserter(prefix));
-		return prefix;
+		std::vector<Path> prefixes;
+		for (auto intermediate : next.at(u).at(v)) {
+		    std::cout << u.get() << " -> " << intermediate.get() << std::endl;
+        	for (auto suffix : getPath(intermediate, v)) {
+    		    Path prefix({u, intermediate});
+        		std::copy(std::begin(suffix), std::end(suffix), std::back_inserter(prefix));
+        		prefixes.push_back(prefix);
+        	}
+		}
+		return prefixes;
 	} catch (const std::out_of_range& ex) {
 		// intermediate does not exist
-		std::vector<NodePtr> direct = {u, v};
+		std::vector<Path> direct = {{u, v}};
 		return direct;
 	}
 }

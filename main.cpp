@@ -48,7 +48,7 @@ class GameWindow : public Gosu::Window
     Graph graph;
     unmanaged_ptr<Node> grabbedNode, connectingNode;
     NodePtr shortestDistSource;
-    std::vector<NodePtr> pathToDraw;
+    std::vector<Path> pathsToDraw;
     Gosu::Image nodeImage;
 public:
     GameWindow()
@@ -156,16 +156,18 @@ public:
             );
         }
 
-        if (!pathToDraw.empty()) {
-            for (auto it = pathToDraw.begin(); it != pathToDraw.end(); it++) {
-                auto next = it;
-                next++;
-                if (next == pathToDraw.end()) break;
-                graphics().drawLine(
-                    (*it)->x, (*it)->y, Gosu::Color::AQUA,
-                    (*next)->x, (*next)->y, Gosu::Color::AQUA,
-                    zUI
-                );
+        if (!pathsToDraw.empty()) {
+            for (auto pathToDraw : pathsToDraw) {
+                for (auto it = pathToDraw.begin(); it != pathToDraw.end(); it++) {
+                    auto next = it;
+                    next++;
+                    if (next == pathToDraw.end()) break;
+                    graphics().drawLine(
+                        (*it)->x, (*it)->y, Gosu::Color::AQUA,
+                        (*next)->x, (*next)->y, Gosu::Color::AQUA,
+                        zUI
+                    );
+                }
             }
         }
 
@@ -233,8 +235,8 @@ public:
                 if (selected) {
                     FloydWarshall fw;
                     fw.run(graph);
-                    pathToDraw = fw.getPath(shortestDistSource, selected);
                     fw.printDistanceMatrix();
+                    pathsToDraw = fw.getPath(shortestDistSource, selected);
                 }
                 // release edge
                 shortestDistSource.clear();

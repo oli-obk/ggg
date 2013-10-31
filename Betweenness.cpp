@@ -12,16 +12,22 @@ void Betweenness::run(const Graph& g) {
 		for (auto s: g.getNodes()) {
 			for (auto t: g.getNodes()) {
 				if (t != u && t != u) {
-					std::vector<NodePtr> sp = this->apsp->getPath(s, t);
-					assert (sp.size() > 0);
-					paths += 1;
-					if (std::find(sp.begin(), sp.end(), u) != sp.end()) {
-						uPaths += 1;
-					};
+					std::vector<Path> sps = this->apsp->getPath(s, t);
+					assert(!sps.empty());
+					for (auto sp : sps) {
+					    assert(!sp.empty());
+					    paths += 1;
+					    if (std::find(sp.begin(), sp.end(), u) != sp.end()) {
+						    uPaths += 1;
+					    };
+					}
 				}
 			}
 		}
-		betweenness[u] = uPaths / (double) paths;
+		betweenness[u] = uPaths;
+	}
+	for (auto u : g.getNodes()) {
+	    betweenness[u] /= double(paths);
 	}
 
 }
