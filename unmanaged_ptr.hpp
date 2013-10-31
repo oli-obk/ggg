@@ -56,7 +56,7 @@ public:
 
     bool operator!() const noexcept { return !value; }
     
-    operator bool() const  noexcept{ return value; }
+    explicit operator bool() const  noexcept{ return value; }
 
     T& operator*()
     {
@@ -159,6 +159,11 @@ public:
     const T* get() const noexcept
     {
         return value;
+    }
+    
+    bool operator<(const unmanaged_ptr& rhs) const
+    {
+        return value < rhs.value;
     }
 };
 

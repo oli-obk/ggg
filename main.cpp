@@ -132,9 +132,18 @@ public:
                 zUI
             );
         }
-        std::wstringstream wss;
-        wss << graph.getEdgeCount();
-        font.draw(wss.str().c_str(), 0, 0, 0);
+        {
+            std::wstringstream wss;
+            wss << graph.getEdgeCount();
+            font.draw(wss.str().c_str(), 0, 0, 0);
+        }
+        double y = 20;
+        for (auto edge:graph.getEdges()) {
+            std::wstringstream wss;
+            wss << edge->getSource().get() << " -> " << edge->getTarget().get();
+            font.draw(wss.str().c_str(), 0, y, 0);
+            y += 20;
+        }
     }
     
     Position mousePosition() const noexcept
