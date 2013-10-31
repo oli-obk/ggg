@@ -47,6 +47,8 @@ class GameWindow : public Gosu::Window
     optional<Gosu::Image> img;
     Graph graph;
     unmanaged_ptr<Node> grabbedNode, connectingNode;
+    NodePtr shortestDistSource;
+    std::vector<NodePtr> pathToDraw;
     Gosu::Image nodeImage;
 public:
     GameWindow()
@@ -120,6 +122,23 @@ public:
             mousePos
         );
 
+        if (shortestDistSource) {
+            // draw some sparkling green particles not signify a new edge that is being created
+            Position targetPos;
+            auto selected = selectNode();
+            // snap to cursor && not to self
+            if (selected && (selected != shortestDistSource)) {
+                targetPos = *selected;
+            } else {
+                targetPos = mousePos;
+            }
+            graphics().drawLine(
+                targetPos.x, targetPos.y, Gosu::Color::AQUA,
+                shortestDistSource->x, shortestDistSource->y, Gosu::Color::AQUA,
+                zUI
+            );
+        }
+        
         if (connectingNode) {
             // draw some sparkling green particles not signify a new edge that is being created
             Position targetPos;
@@ -136,6 +155,20 @@ public:
                 zUI
             );
         }
+
+        if (!pathToDraw.empty()) {
+            for (auto it = pathToDraw.begin(); it != pathToDraw.end(); it++) {
+                auto next = it;
+                next++;
+                if (next == pathToDraw.end()) break;
+                graphics().drawLine(
+                    (*it)->x, (*it)->y, Gosu::Color::AQUA,
+                    (*next)->x, (*next)->y, Gosu::Color::AQUA,
+                    zUI
+                );
+            }
+        }
+
         {
             std::wstringstream wss;
             wss << graph.getEdgeCount();
@@ -174,7 +207,13 @@ public:
         } else if (btn == Gosu::msLeft) {
             auto selected = selectNode();
             if (selected) {
-                grabbedNode = selected;
+                if (input().down(Gosu::kbLeftShift)) {
+                    // compute shortest distance
+                    shortestDistSource = selected;
+                } else {
+                    // dragl
+                    grabbedNode = selected;
+                }
             }
         } else if (btn == Gosu::msRight) {
             auto selected = selectNode();
@@ -189,6 +228,16 @@ public:
         if (btn == Gosu::msLeft) {
             // release any currently dragged node
             grabbedNode.clear();
+            if (shortestDistSource) {
+                auto selected = selectNode();
+                if (selected) {
+                    FloydWarshall fw;
+                    fw.run(graph);
+                    pathToDraw = fw.getPath(shortestDistSource, selected);
+                }
+                // release edge
+                shortestDistSource.clear();
+            }
         } else if (btn == Gosu::kbSpace) {
             auto selected = selectNode();
             if (!selected) {
@@ -208,6 +257,8 @@ public:
                 // release edge
                 connectingNode.clear();
             }
+        } else if (btn == Gosu::kbLeftShift) {
+            shortestDistSource.clear();
         }
     }
 };
