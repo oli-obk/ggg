@@ -113,17 +113,18 @@ public:
     void draw() noexcept override
     {
         for (auto& node:graph.getNodes()) {
-            nodeImage.draw(node->x-10, node->y-10, zNodes, 1, 1, Gosu::Color::RED);
+            double val = betweenness.getValue(node);
+            auto col = Gosu::interpolate(Gosu::Color::BLUE, Gosu::Color::RED, val);
+            nodeImage.draw(node->x-10, node->y-10, zNodes, 1, 1, col);
             for (auto& edge: node->getEdges()) {
+                double val2 = betweenness.getValue(edge->getTarget());
+                auto col2 = Gosu::interpolate(Gosu::Color::BLUE, Gosu::Color::RED, val2);
                 graphics().drawLine(
-                    node->x, node->y, Gosu::Color::BLUE,
-                    edge->getTarget()->x, edge->getTarget()->y, Gosu::Color::BLUE,
+                    node->x, node->y, col,
+                    edge->getTarget()->x, edge->getTarget()->y, col2,
                     zEdges
                 );
             }
-            std::wstringstream wss;
-            wss << betweenness.getValue(node);
-            font.draw(wss.str().c_str(), node->x, node->y, zNodes);
         }
         auto mousePos = mousePosition();
         drawLine(graphics(), Gosu::Color::WHITE, zUI,
@@ -184,15 +185,8 @@ public:
 
         {
             std::wstringstream wss;
-            wss << graph.getEdgeCount();
+            wss << Gosu::fps();
             font.draw(wss.str().c_str(), 0, 0, 0);
-        }
-        double y = 20;
-        for (auto edge:graph.getUndirectedEdges()) {
-            std::wstringstream wss;
-            wss << edge->getSource().get() << " -> " << edge->getTarget().get();
-            font.draw(wss.str().c_str(), 0, y, 0);
-            y += 20;
         }
     }
     

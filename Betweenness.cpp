@@ -36,7 +36,7 @@ void Betweenness::run(const Graph& g) {
 			}
 		}
 		betweenness[u] = uPaths;
-		paths += uPaths;
+		paths = std::max(paths, uPaths);
 	}
 	if (paths != 0) {
 	    for (auto u : g.getNodes()) {
