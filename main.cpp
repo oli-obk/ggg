@@ -21,6 +21,8 @@
 #import "Edge.hpp"
 
 #import "FloydWarshall.hpp"
+#import "Betweenness.hpp"
+#import <iostream>
 
 enum ZOrder
 {
@@ -50,6 +52,7 @@ class GameWindow : public Gosu::Window
     NodePtr shortestDistSource;
     std::vector<Path> pathsToDraw;
     Gosu::Image nodeImage;
+    Betweenness betweenness;
 public:
     GameWindow()
     :Window(640, 480, false)
@@ -91,7 +94,11 @@ public:
         
         auto node = graph.createNode(Position(100, 100));
         auto node2 = graph.createNode(Position(150, 200));
+        auto node3 = graph.createNode(Position(400, 200));
+        auto node4 = graph.createNode(Position(300, 300));
         node->connect(node2);
+        node2->connect(node3);
+        node3->connect(node4);
     }
 
     void update() noexcept override
@@ -100,6 +107,7 @@ public:
             grabbedNode->x = input().mouseX();
             grabbedNode->y = input().mouseY();
         }
+        betweenness.run(graph);
     }
 
     void draw() noexcept override
@@ -113,6 +121,9 @@ public:
                     zEdges
                 );
             }
+            std::wstringstream wss;
+            wss << betweenness.getValue(node);
+            font.draw(wss.str().c_str(), node->x, node->y, zNodes);
         }
         auto mousePos = mousePosition();
         drawLine(graphics(), Gosu::Color::WHITE, zUI,
@@ -232,7 +243,7 @@ public:
             grabbedNode.clear();
             if (shortestDistSource) {
                 auto selected = selectNode();
-                if (selected) {
+                if (selected && selected != shortestDistSource) {
                     FloydWarshall fw;
                     fw.run(graph);
                     fw.printDistanceMatrix();

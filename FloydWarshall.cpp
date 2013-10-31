@@ -34,50 +34,85 @@ void FloydWarshall::run(const Graph& g) {
 
 	// main part of algorithm
 	for (auto k: g.getNodes()) {
+	    //std::cout << "k = " << k->getId() << std::endl;
 		for (auto i: g.getNodes()) {
-		    if (i == k) continue;
+		    //std::cout << "\ti = " << i->getId() << std::endl;
 			for (auto j: g.getNodes()) {
-			    if (i == j) continue;
-			    if (j == k) continue;
+    		    //std::cout << "\t\tj = " << j->getId() << std::endl;
 			    auto d = dist[i][k] + dist[k][j];
+    		    //std::cout << "\t\t\t" << d << " = " << dist[i][k] << " + " << dist[k][j] << std::endl;
 				if (d < dist[i][j]) {
+        		    //std::cout << "\t\t\t" << d << " < " << dist[i][j] << std::endl;
 					dist[i][j] = d;
-					next[i][j].clear();
-					next[i][j].insert(k); // needed to reconstruct path
-				} else if (d == dist[i][j]) {
-				    if (!next[i][j].empty()) {
-				        next[i][j].insert(k);
-				    }
 				}
 			}
 		}
 	}
-
+	
+	
+	for (auto from: g.getNodes()) {
+		for (auto to: g.getNodes()) {
+		    if (from == to) continue;
+		    if (dist[from][to] == inf) continue;
+		    if (dist[from][to] == 1) continue;
+		    double mind = inf;
+			for (auto over: g.getNodes()) {
+			    if (from == over) continue;
+			    if (dist[from][over] != 1) continue;
+			    auto d = dist[over][to];
+			    if (d < mind) {
+			        mind = d;
+			        next[from][to] = {over};
+			    } else if (d == mind) {
+			        next[from][to].insert(over);
+			    }
+			}
+		}
+	}
+	/*
+	std::cout << std::endl;
+	for (auto u_ : next) {
+    	std::cout << u_.first->getId() << std::endl;
+	    for (auto v_ : u_.second) {
+	        std::cout << "\t" << v_.first->getId() << "\t";
+	        for (auto node : v_.second) {
+	            std::cout << "\t" << node->getId();
+	        }
+	        std::cout << std::endl;
+	    }
+	}
+	assert(false);
+	*/
 }
 
 std::vector<Path> FloydWarshall::getPath(NodePtr u, NodePtr v) const {
 	if (dist.at(u).at(v) == inf) {
 		return std::vector<Path>();
 	}
+	if (u == v) {
+	    throw std::runtime_error("knoten haben keine pfade zu sich selbst");
+	}
 	
+	/*
 	std::cout << std::endl;
 	for (auto u_ : next) {
-    	std::cout << u_.first.get() << std::endl;
+    	std::cout << u_.first->getId() << std::endl;
 	    for (auto v_ : u_.second) {
-	        std::cout << "\t" << v_.first.get() << "\t";
+	        std::cout << "\t" << v_.first->getId() << "\t";
 	        for (auto node : v_.second) {
-	            std::cout << "\t" << node.get();
+	            std::cout << "\t" << node->getId();
 	        }
 	        std::cout << std::endl;
 	    }
 	}
+	*/
 
 	try {
 		std::vector<Path> prefixes;
 		for (auto intermediate : next.at(u).at(v)) {
-		    std::cout << u.get() << " -> " << intermediate.get() << std::endl;
+		    //std::cout << u.get() << " -> " << intermediate.get() << std::endl;
         	for (auto suffix : getPath(intermediate, v)) {
-    		    Path prefix({u, intermediate});
+    		    Path prefix({u});
         		std::copy(std::begin(suffix), std::end(suffix), std::back_inserter(prefix));
         		prefixes.push_back(prefix);
         	}
@@ -93,10 +128,16 @@ std::vector<Path> FloydWarshall::getPath(NodePtr u, NodePtr v) const {
 
 void FloydWarshall::printDistanceMatrix() const
 {
+    std::cout << "\t";
     for (auto& x : dist) {
+        std::cout << x.first->getId() << "\t";
+    }
+    std::cout << std::endl;
+    for (auto& x : dist) {
+        std::cout << x.first->getId() << "\t";
         for (auto& y : x.second) {
             if (y.second == inf) {
-                std::cout << "inf ";
+                std::cout << "inf\t";
             } else {
                 std::cout << y.second << "\t";
             }

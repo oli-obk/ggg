@@ -24,9 +24,14 @@ private:
     Node& operator=(const Node&) = delete;
     Node(Node&&) = delete;
     Node& operator=(Node&&) = delete;
+    size_t id;
 public:
-    Node(Position pos = Position()) noexcept
-    :Position(pos){}
+    Node(Position pos, size_t id) noexcept
+    :Position(pos)
+    ,id(id)
+    {}
+    
+    size_t getId() const noexcept { return id; }
     
     ~Node();
     

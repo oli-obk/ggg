@@ -13,7 +13,6 @@ public:
 
 private:
 
-	AllPairShortestPath* apsp;
 	std::map<NodePtr, double> betweenness;
 
 };

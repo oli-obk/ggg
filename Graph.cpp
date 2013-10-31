@@ -23,10 +23,15 @@ NodePtr Graph::getNearestNode(Position pos) noexcept
     return found;
 }
 
+Graph::Graph()
+:cur_id(0)
+{
+}
+
 
 NodePtr Graph::createNode(Position pos)
 {
-    nodes.push_back(std::make_unique<Node>(pos));
+    nodes.push_back(std::make_unique<Node>(pos, cur_id++));
     return nodes.back().get();
 }
 

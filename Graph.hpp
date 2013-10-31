@@ -29,8 +29,9 @@ class Graph
     Graph& operator=(const Graph&) = delete;
     Graph(Graph&&) = delete;
     Graph& operator=(Graph&&) = delete;
+    size_t cur_id;
 public:
-    Graph() = default;
+    Graph();
     
     const std::vector<NodePtr> getNodes() const noexcept;
     
