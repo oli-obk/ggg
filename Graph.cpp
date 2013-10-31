@@ -42,7 +42,7 @@ void Graph::deleteNode(unmanaged_ptr<Node> node)
 
 size_t Graph::getEdgeCount() const noexcept
 {
-    size_t ret;
+    size_t ret = 0;
     for (auto& node:nodes) {
         ret += node -> getEdgeCount();
     }
