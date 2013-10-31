@@ -1,7 +1,10 @@
-#include "Node.hpp"
-#include "Edge.hpp"
-#include <memory>
-#include "unmanaged_ptr.hpp"
+#import "Node.hpp"
+#import "Edge.hpp"
+#import <memory>
+#import "unmanaged_ptr.hpp"
+
+typedef unmanaged_ptr<const Node> NodePtr;
+typedef unmanaged_ptr<const Edge> EdgePtr;
 
 class TooManyNodesException : public std::runtime_error
 {
@@ -45,5 +48,5 @@ public:
     
     size_t getEdgeCount() const noexcept;
     
-    std::vector<unmanaged_ptr<const Edge>> getEdges() const noexcept;
+    std::vector<unmanaged_ptr<const Edge>> getUndirectedEdges() const noexcept;
 };

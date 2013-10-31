@@ -1,7 +1,4 @@
-#ifndef GGG_POSITION_HPP
-#define GGG_POSITION_HPP
-
-#include <cmath>
+#import <cmath>
 
 class Position
 {
@@ -39,5 +36,3 @@ namespace std
         return Position(std::abs(pos.x), std::abs(pos.y));
     }
 }
-
-#endif //GGG_POSITION_HPP

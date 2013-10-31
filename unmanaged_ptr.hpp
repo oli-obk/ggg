@@ -1,10 +1,7 @@
-#ifndef UNMANAGED_PTR_HPP
-#define UNMANAGED_PTR_HPP
-
-#include <cstddef>
-#include <memory>
-#include <cassert>
-#include <type_traits>	
+#import <cstddef>
+#import <memory>
+#import <cassert>
+#import <type_traits>	
 
 template<typename T>
 class unmanaged_ptr
@@ -202,5 +199,3 @@ bool operator!=(const T* lhs, const unmanaged_ptr<T>& rhs)
 {
     return rhs != lhs;
 }
-
-#endif //UNMANAGED_PTR_HPP

@@ -1,7 +1,7 @@
-#include "Graph.hpp"
-#include "make_unique.hpp"
-#include <limits>
-#include <set>
+#import "Graph.hpp"
+#import "make_unique.hpp"
+#import <limits>
+#import <set>
 
 unmanaged_ptr<Node> Graph::getNearestNode(Position pos) noexcept
 {
@@ -62,7 +62,7 @@ std::vector<unmanaged_ptr<const Node>> Graph::getNodes() const noexcept
 }
 
 
-std::vector<unmanaged_ptr<const Edge>> Graph::getEdges() const noexcept
+std::vector<unmanaged_ptr<const Edge>> Graph::getUndirectedEdges() const noexcept
 {
     std::vector<unmanaged_ptr<const Edge>> ret;
     std::set<unmanaged_ptr<const Node>> processedNodes;

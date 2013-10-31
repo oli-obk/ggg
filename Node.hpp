@@ -1,11 +1,8 @@
-#ifndef GGG_NODE_HPP
-#define GGG_NODE_HPP
-
-#include "Edge.hpp"
-#include "Position.hpp"
-#include <vector>
-#include <memory>
-#include "unmanaged_ptr.hpp"
+#import "Edge.hpp"
+#import "Position.hpp"
+#import <vector>
+#import <memory>
+#import "unmanaged_ptr.hpp"
 
 class NodesAlreadyConnectedException : public std::runtime_error
 {
@@ -44,4 +41,3 @@ public:
     unmanaged_ptr<Edge> connect(unmanaged_ptr<Node> other);
 };
 
-#endif //GGG_NODE_HPP
