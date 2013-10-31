@@ -1,6 +1,8 @@
 #import <iostream>
 
 #import "Graph.hpp"
+#import "Node.hpp"
+#import "Edge.hpp"
 
 void testGraph() {
 	Graph G;

@@ -1,14 +1,16 @@
 #import "Graph.hpp"
+#import "Node.hpp"
+#import "Edge.hpp"
 #import "make_unique.hpp"
 #import <limits>
 #import <set>
 
-unmanaged_ptr<Node> Graph::getNearestNode(Position pos) noexcept
+NodePtr Graph::getNearestNode(Position pos) noexcept
 {
     if (nodes.empty()) {
         throw ThereAreNoNodesException("can't get nearest node without any nodes");
     }
-    unmanaged_ptr<Node> found;
+    NodePtr found;
     double dist = std::numeric_limits<double>::max();
     for (auto& node:nodes) {
         auto _dist = pos.distanceSquared(*node);
@@ -22,13 +24,13 @@ unmanaged_ptr<Node> Graph::getNearestNode(Position pos) noexcept
 }
 
 
-unmanaged_ptr<Node> Graph::createNode(Position pos)
+NodePtr Graph::createNode(Position pos)
 {
     nodes.push_back(std::make_unique<Node>(pos));
     return nodes.back().get();
 }
 
-void Graph::deleteNode(unmanaged_ptr<Node> node)
+void Graph::deleteNode(NodePtr node)
 {
     for (auto& n:nodes) {
         if (n == node) {
@@ -51,9 +53,9 @@ size_t Graph::getEdgeCount() const noexcept
     return ret>>1;
 }
 
-std::vector<unmanaged_ptr<const Node>> Graph::getNodes() const noexcept
+const std::vector<NodePtr> Graph::getNodes() const noexcept
 {
-    std::vector<unmanaged_ptr<const Node>> ret;
+    std::vector<NodePtr> ret;
     ret.reserve(nodes.size());
     for (auto& node:nodes) {
         ret.push_back(node.get());
@@ -62,10 +64,10 @@ std::vector<unmanaged_ptr<const Node>> Graph::getNodes() const noexcept
 }
 
 
-std::vector<unmanaged_ptr<const Edge>> Graph::getUndirectedEdges() const noexcept
+const std::vector<EdgePtr> Graph::getUndirectedEdges() const noexcept
 {
-    std::vector<unmanaged_ptr<const Edge>> ret;
-    std::set<unmanaged_ptr<const Node>> processedNodes;
+    std::vector<EdgePtr> ret;
+    std::set<NodePtr> processedNodes;
     for (auto& node:nodes) {
         for (auto edge:node->getEdges()) {
             if (processedNodes.find(edge->getTarget()) != processedNodes.end()) {

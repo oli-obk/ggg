@@ -1,4 +1,5 @@
 #import "Node.hpp"
+#import "Edge.hpp"
 #import <functional>
 #import "make_unique.hpp"
 #import <cassert>
@@ -19,25 +20,25 @@ Node::~Node()
     }
 }
 
-std::vector<unmanaged_ptr<Edge>> Node::getEdges() noexcept
+std::vector<EdgePtr> Node::getEdges() noexcept
 {
-    std::vector<unmanaged_ptr<Edge>> ret;
+    std::vector<EdgePtr> ret;
     for (auto& edge:edges) {
         ret.push_back(edge.get());
     }
     return ret;
 }
 
-std::vector<unmanaged_ptr<const Edge>> Node::getEdges() const noexcept
+const std::vector<EdgePtr> Node::getEdges() const noexcept
 {
-    std::vector<unmanaged_ptr<const Edge>> ret;
+    std::vector<EdgePtr> ret;
     for (auto& edge:edges) {
         ret.push_back(edge.get());
     }
     return ret;
 }
 
-unmanaged_ptr<Edge> Node::getEdge(unmanaged_ptr<Node> other) noexcept
+const EdgePtr Node::getEdge(const NodePtr other) const noexcept
 {
     for (auto& edge:edges) {
         if (edge->getTarget() != other) continue;
@@ -46,7 +47,7 @@ unmanaged_ptr<Edge> Node::getEdge(unmanaged_ptr<Node> other) noexcept
     return nullptr;
 }
 
-unmanaged_ptr<Edge> Node::connect(unmanaged_ptr<Node> other)
+EdgePtr Node::connect(NodePtr other)
 {
     if (getEdge(other)) throw NodesAlreadyConnectedException("there is already an edge");
     // create edge from here to there

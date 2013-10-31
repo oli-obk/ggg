@@ -1,8 +1,8 @@
-#import "Edge.hpp"
 #import "Position.hpp"
 #import <vector>
 #import <memory>
 #import "unmanaged_ptr.hpp"
+#import "ForwardDeclarations.hpp"
 
 class NodesAlreadyConnectedException : public std::runtime_error
 {
@@ -32,12 +32,12 @@ public:
     
     size_t getEdgeCount() const noexcept { return edges.size(); }
     
-    std::vector<unmanaged_ptr<Edge>> getEdges() noexcept;
+    std::vector<EdgePtr> getEdges() noexcept;
     
-    std::vector<unmanaged_ptr<const Edge>> getEdges() const noexcept;
+    const std::vector<EdgePtr> getEdges() const noexcept;
     
-    unmanaged_ptr<Edge> getEdge(unmanaged_ptr<Node> other) noexcept;
+    const EdgePtr getEdge(const NodePtr other) const noexcept;
     
-    unmanaged_ptr<Edge> connect(unmanaged_ptr<Node> other);
+    EdgePtr connect(NodePtr other);
 };
 

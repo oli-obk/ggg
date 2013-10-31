@@ -1,10 +1,8 @@
-#import "Node.hpp"
-#import "Edge.hpp"
 #import <memory>
+#import <vector>
 #import "unmanaged_ptr.hpp"
-
-typedef unmanaged_ptr<const Node> NodePtr;
-typedef unmanaged_ptr<const Edge> EdgePtr;
+#import "Position.hpp"
+#import "ForwardDeclarations.hpp"
 
 class TooManyNodesException : public std::runtime_error
 {
@@ -34,19 +32,19 @@ class Graph
 public:
     Graph() = default;
     
-    std::vector<unmanaged_ptr<const Node>> getNodes() const noexcept;
+    const std::vector<NodePtr> getNodes() const noexcept;
     
-    unmanaged_ptr<Node> getNearestNode(Position pos) noexcept;
+    NodePtr getNearestNode(Position pos) noexcept;
 
     // throws a TooManyNodesException if there are already 100 nodes
-    unmanaged_ptr<Node> createNode(Position pos);
+    NodePtr createNode(Position pos);
     
     size_t getNodeCount() const noexcept { return nodes.size(); }
 
     // throws an UnknownNodeException if the node is not handled by this graph
-    void deleteNode(unmanaged_ptr<Node> node);
+    void deleteNode(NodePtr node);
     
     size_t getEdgeCount() const noexcept;
     
-    std::vector<unmanaged_ptr<const Edge>> getUndirectedEdges() const noexcept;
+    const std::vector<EdgePtr> getUndirectedEdges() const noexcept;
 };

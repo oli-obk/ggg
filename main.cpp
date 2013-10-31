@@ -17,6 +17,10 @@
 #import "unmanaged_ptr.hpp"
 
 #import "Graph.hpp"
+#import "Node.hpp"
+#import "Edge.hpp"
+
+#import "FloydWarshall.hpp"
 
 enum ZOrder
 {

@@ -1,4 +1,6 @@
 #import "FloydWarshall.hpp"
+#import "Node.hpp"
+#import "Edge.hpp"
 
 void FloydWarshall::run(const Graph& g) {
 
