@@ -14,33 +14,40 @@ private:
 
 public:
     // default constructor
-    unmanaged_ptr() noexcept : value(nullptr) {}
+    constexpr unmanaged_ptr() noexcept : value(nullptr) {}
     
-    unmanaged_ptr(nullptr_t) noexcept : value(nullptr) {}
+    constexpr unmanaged_ptr(nullptr_t) noexcept : value(nullptr) {}
     
     // initializer
-    unmanaged_ptr(T* v) noexcept : value(v) {}
+    constexpr unmanaged_ptr(T* v) noexcept : value(v) {}
     unmanaged_ptr& operator=(T* v) noexcept { value = v; return *this; }
-    unmanaged_ptr(std::unique_ptr<T>* v) noexcept : value(v.get()) {}
+    constexpr unmanaged_ptr(std::unique_ptr<T>* v) noexcept : value(v.get()) {}
     unmanaged_ptr& operator=(std::unique_ptr<T>& v) noexcept { value = v.get(); return *this; }
-    unmanaged_ptr(std::shared_ptr<T>* v) noexcept : value(v.get()) {}
+    constexpr unmanaged_ptr(std::shared_ptr<T>* v) noexcept : value(v.get()) {}
     unmanaged_ptr& operator=(std::shared_ptr<T>& v) noexcept { value = v.get(); return *this; }
     
     friend class unmanaged_ptr<const T>;
     
     // copy constructor
-    unmanaged_ptr(const unmanaged_ptr<typename std::remove_const<T>::type>& other) noexcept
+    constexpr unmanaged_ptr(const unmanaged_ptr<T>& other) noexcept
+    :value(other.value)
     {
-        value = other.value;
     }
-    unmanaged_ptr& operator=(const unmanaged_ptr<typename std::remove_const<T>::type>& other) noexcept
+    
+    unmanaged_ptr& operator=(const unmanaged_ptr<T>& other) noexcept = default;
+    
+    template<typename T2 = T>
+    constexpr unmanaged_ptr(const unmanaged_ptr<typename std::remove_const<T2>::type>& other, typename std::enable_if<std::is_const<T2>::value>::type* = nullptr) noexcept
+    :value(other.value)
+    {
+    }
+    
+    template<typename T2 = T, class = typename std::enable_if<std::is_const<T2>::value>::type>
+    unmanaged_ptr& operator=(const unmanaged_ptr<typename std::remove_const<T2>::type>& other) noexcept
     {
         value = other.value;
         return *this;
     }
-    
-    unmanaged_ptr(unmanaged_ptr&&) noexcept = default;
-    unmanaged_ptr& operator=(unmanaged_ptr&&) noexcept = default;
 
     ~unmanaged_ptr()
     {
