@@ -9,7 +9,23 @@ protected:
     std::vector<Player> players;
 public:
     Game(std::vector<Player> players);
-    const std::vector<Player>& getPlayers() const { return players; }
+    std::vector<unmanaged_ptr<const Player>> getPlayers() const
+    {
+        std::vector<unmanaged_ptr<const Player>> ret;
+        for (auto& p : players) {
+            ret.push_back(&p);
+        }
+        return ret;
+    }
+    
+    std::vector<unmanaged_ptr<Player>> getPlayers()
+    {
+        std::vector<unmanaged_ptr<Player>> ret;
+        for (auto& p : players) {
+            ret.push_back(&p);
+        }
+        return ret;
+    }
 };
 
 class ScoredGame : public Game

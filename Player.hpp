@@ -17,5 +17,6 @@ public:
     
     // setters
     void setScore(double s) { score = s; }
+    void addScore(double s) { score += s; }
     void setColor(Gosu::Color col) { color = col; }
 };

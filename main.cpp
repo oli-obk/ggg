@@ -97,11 +97,7 @@ public:
         
         auto node = graph.createNode(Position(100, 100));
         auto node2 = graph.createNode(Position(150, 200));
-        auto node3 = graph.createNode(Position(400, 200));
-        auto node4 = graph.createNode(Position(300, 300));
         node->connect(node2);
-        node2->connect(node3);
-        node3->connect(node4);
     }
 
     void update() noexcept override
@@ -115,6 +111,14 @@ public:
     void onGraphChanged()
     {
         betweenness.run(graph);
+        for (auto player : game.getPlayers()) {
+            player->setScore(0);
+        }
+        for (auto node : graph.getNodes()) {
+            auto it = nodeOwner.find(node);
+            if (it == nodeOwner.end()) continue;
+            it->second->addScore(betweenness.getValue(node));
+        }
     }
 
     void draw() noexcept override
@@ -209,15 +213,32 @@ public:
         }
         double y = 20;
         auto currentPlayer = game.getCurrentPlayer();
-        for (auto& player : game.getPlayers()) {
-            auto name = player.getName();
+        for (auto player : game.getPlayers()) {
+            auto name = player->getName();
             auto wname = std::wstring(std::begin(name), std::end(name));
-            if (&player == currentPlayer) {
-                font.draw(wname, 0, y-2, zUI, 1.4, 1.4, player.getColor());
+            if (player == currentPlayer) {
+                font.draw(wname, 0, y-2, zUI, 1.4, 1.4, player->getColor());
             } else {
-                font.draw(wname, 0, y, zUI, 1, 1, player.getColor());
+                font.draw(wname, 0, y, zUI, 1, 1, player->getColor());
             }
             y += 20;
+        }
+        
+        double x = graphics().width() - 50;
+        for (auto player : game.getPlayers()) {
+            auto col = player->getColor();
+            double score = player->getScore() * 30;
+            graphics().drawQuad(
+                x, 0, col,
+                x+40, 0, col,
+                x+40, score, col,
+                x, score, col,
+                zUI
+            );
+            std::wstringstream wss;
+            wss << score;
+            font.draw(wss.str().c_str(), x, score, zUI);
+            x -= 50;
         }
     }
     
@@ -246,12 +267,16 @@ public:
             auto selected = selectNode();
             if (selected) {
                 if (input().down(Gosu::kbLeftShift)) {
-                    // compute shortest distance
-                    shortestDistSource = selected;
-                } else {
                     // dragl
                     grabbedNode = selected;
                 }
+            } else {
+                auto nearest = graph.getNearestNode(mousePosition());
+                auto node = graph.createNode(mousePosition());
+                nodeOwner[node] = game.getCurrentPlayer();
+                node -> connect(nearest);
+                onGraphChanged();
+                game.endTurn();
             }
         } else if (btn == Gosu::msRight) {
             auto selected = selectNode();
@@ -266,27 +291,6 @@ public:
         if (btn == Gosu::msLeft) {
             // release any currently dragged node
             grabbedNode.clear();
-            if (shortestDistSource) {
-                auto selected = selectNode();
-                if (selected && selected != shortestDistSource) {
-                    FloydWarshall fw;
-                    fw.run(graph);
-                    fw.printDistanceMatrix();
-                    pathsToDraw = fw.getPath(shortestDistSource, selected);
-                }
-                // release edge
-                shortestDistSource.clear();
-            }
-        } else if (btn == Gosu::kbSpace) {
-            auto selected = selectNode();
-            if (!selected) {
-                auto nearest = graph.getNearestNode(mousePosition());
-                auto node = graph.createNode(mousePosition());
-                nodeOwner[node] = game.getCurrentPlayer();
-                node -> connect(nearest);
-                onGraphChanged();
-                game.endTurn();
-            }
         } else if (btn == Gosu::msRight) {
             if (connectingNode) {
                 auto selected = selectNode();
@@ -302,7 +306,7 @@ public:
                 connectingNode.clear();
             }
         } else if (btn == Gosu::kbLeftShift) {
-            shortestDistSource.clear();
+            grabbedNode.clear();
         }
     }
 };
