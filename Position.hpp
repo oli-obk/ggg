@@ -47,7 +47,37 @@ public:
     {
         return Position(x + rhs.x, y + rhs.y);
     }
+    
+    Position operator-(const PositionPtr rhs) const noexcept
+    {
+        return *this - *rhs;
+    }
+
+    Position operator+(const PositionPtr rhs) const noexcept
+    {
+        return *this + *rhs;
+    }
+    
+    Position operator*(double val) const noexcept
+    {
+        return Position(x*val, y*val);
+    }
+    
+    Position operator/(double val) const
+    {
+        return Position(x/val, y/val);
+    }
 };
+
+inline Position operator*(double val, const Position& pos) noexcept
+{
+    return pos*val;
+}
+
+inline Position operator*(double val, const PositionPtr pos) noexcept
+{
+    return (*pos)*val;
+}
 
 namespace std
 {
