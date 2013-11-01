@@ -11,6 +11,8 @@ SET(SRC_FILES
 	Graph.cpp
 	FloydWarshall.cpp
 	Betweenness.cpp
+	Game.cpp
+	Player.cpp
 	)
 
 #Projects headers files	
@@ -20,6 +22,8 @@ SET(INC_FILES
     Edge.hpp
     optional.hpp
     unmanaged_ptr.hpp
+    Game.hpp
+    Player.hpp
 	)
 
 #"Sources" and "Headers" are the group names in Visual Studio.

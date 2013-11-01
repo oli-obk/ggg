@@ -24,6 +24,8 @@
 #import "Betweenness.hpp"
 #import <iostream>
 
+#import "Game.hpp"
+
 enum ZOrder
 {
     zBackground,
@@ -52,7 +54,10 @@ class GameWindow : public Gosu::Window
     NodePtr shortestDistSource;
     std::vector<Path> pathsToDraw;
     Gosu::Image nodeImage = {graphics(), L"node.png", true};
+    Gosu::Image nodeFillImage = {graphics(), L"node_fill.png", true};
     Betweenness betweenness;
+    TurnbasedGame game = TurnbasedGame({{"Player 1", Gosu::Color::YELLOW}, {"Player 2", Gosu::Color::CYAN}});
+    std::map<NodePtr, unmanaged_ptr<Player>> nodeOwner;
 public:
     GameWindow()
     :Window(640, 480, false)
@@ -118,6 +123,10 @@ public:
             double val = betweenness.getValue(node);
             auto col = Gosu::interpolate(Gosu::Color::BLUE, Gosu::Color::RED, val);
             nodeImage.draw(node->x-10, node->y-10, zNodes, 1, 1, col);
+            auto owner = nodeOwner.find(node);
+            if (owner != nodeOwner.end()) {
+                nodeFillImage.draw(node->x-10, node->y-10, zNodes, 1, 1, owner->second->getColor());
+            }
             for (auto& edge: node->getEdges()) {
                 double val2 = betweenness.getValue(edge->getTarget());
                 auto col2 = Gosu::interpolate(Gosu::Color::BLUE, Gosu::Color::RED, val2);
@@ -195,8 +204,20 @@ public:
 
         {
             std::wstringstream wss;
-            wss << Gosu::fps();
-            font.draw(wss.str().c_str(), 0, 0, 0);
+            wss << Gosu::fps() << L" fps";
+            font.draw(wss.str().c_str(), 0, 0, zUI);
+        }
+        double y = 20;
+        auto currentPlayer = game.getCurrentPlayer();
+        for (auto& player : game.getPlayers()) {
+            auto name = player.getName();
+            auto wname = std::wstring(std::begin(name), std::end(name));
+            if (&player == currentPlayer) {
+                font.draw(wname, 0, y-2, zUI, 1.4, 1.4, player.getColor());
+            } else {
+                font.draw(wname, 0, y, zUI, 1, 1, player.getColor());
+            }
+            y += 20;
         }
     }
     
@@ -261,11 +282,11 @@ public:
             if (!selected) {
                 auto nearest = graph.getNearestNode(mousePosition());
                 auto node = graph.createNode(mousePosition());
+                nodeOwner[node] = game.getCurrentPlayer();
                 node -> connect(nearest);
-            } else {
-                graph.deleteNode(selected);
+                onGraphChanged();
+                game.endTurn();
             }
-            onGraphChanged();
         } else if (btn == Gosu::msRight) {
             if (connectingNode) {
                 auto selected = selectNode();
@@ -274,6 +295,7 @@ public:
                     if (!selected->getEdge(connectingNode)) {
                         selected->connect(connectingNode);
                         onGraphChanged();
+                        game.endTurn();
                     }
                 }
                 // release edge
