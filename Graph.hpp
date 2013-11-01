@@ -3,6 +3,8 @@
 #import "unmanaged_ptr.hpp"
 #import "Position.hpp"
 #import "ForwardDeclarations.hpp"
+#import "Node.hpp"
+#import "Edge.hpp"
 
 class TooManyNodesException : public std::runtime_error
 {

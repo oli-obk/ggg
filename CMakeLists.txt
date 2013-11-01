@@ -13,6 +13,7 @@ SET(SRC_FILES
 	Betweenness.cpp
 	Game.cpp
 	Player.cpp
+    ForceDirected.cpp
 	)
 
 #Projects headers files	
