@@ -31,6 +31,13 @@ public:
     ,id(id)
     {}
     
+    Node& operator=(const Position& pos)
+    {
+        x = pos.x;
+        y = pos.y;
+        return *this;
+    }
+    
     size_t getId() const noexcept { return id; }
     
     ~Node();
