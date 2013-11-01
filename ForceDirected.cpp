@@ -23,7 +23,7 @@ void ForceDirected::run(Graph& g) {
 			d = 0.000001;
 		}
 		double value = d / springLength;
-		Vector direction = _u - _v;
+		Vector direction = _v - _u;
 		Vector force = (direction / d) * value;
 		return force;
 	};
