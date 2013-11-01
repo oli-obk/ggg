@@ -137,6 +137,14 @@ public:
             mousePos + Position(5, 20),
             mousePos
         );
+        if (!connectingNode) {
+            auto nearest = graph.getNearestNode(mousePos);
+            graphics().drawLine(
+                    mousePos.x, mousePos.y, Gosu::Color::YELLOW,
+                    nearest->x, nearest->y, Gosu::Color::YELLOW,
+                    zUI
+                );
+        }
 
         if (shortestDistSource) {
             // draw some sparkling green particles not signify a new edge that is being created
@@ -253,7 +261,9 @@ public:
         } else if (btn == Gosu::kbSpace) {
             auto selected = selectNode();
             if (!selected) {
-                graph.createNode(mousePosition());
+                auto nearest = graph.getNearestNode(mousePosition());
+                auto node = graph.createNode(mousePosition());
+                node -> connect(nearest);
             } else {
                 graph.deleteNode(selected);
             }
