@@ -5,7 +5,7 @@ typedef Position Vector;
 class ForceDirected : public Layout {
 public:
 
-	ForceDirected(double repConst=0.4, double step=0.05, double scale=1, int iterations=30);
+	ForceDirected(double repConst=0.8, double step=5, double scale=100, int iterations=30);
 
 	void run(Graph& g) override;
 

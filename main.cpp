@@ -25,6 +25,7 @@
 #import <iostream>
 
 #import "Game.hpp"
+#import "ForceDirected.hpp"
 
 enum ZOrder
 {
@@ -106,6 +107,8 @@ public:
             grabbedNode->x = input().mouseX();
             grabbedNode->y = input().mouseY();
         }
+        ForceDirected forces;
+        forces.run(graph);
     }
     
     void onGraphChanged()
