@@ -45,19 +45,17 @@ void drawLine(Gosu::Graphics& g, Gosu::Color col, double z, T pos, T pos2, Args.
 
 class GameWindow : public Gosu::Window
 {
-    Gosu::Font font;
+    Gosu::Font font = {graphics(), Gosu::defaultFontName(), 20};
     optional<Gosu::Image> img;
     Graph graph;
     unmanaged_ptr<Node> grabbedNode, connectingNode;
     NodePtr shortestDistSource;
     std::vector<Path> pathsToDraw;
-    Gosu::Image nodeImage;
+    Gosu::Image nodeImage = {graphics(), L"node.png", true};
     Betweenness betweenness;
 public:
     GameWindow()
     :Window(640, 480, false)
-    ,font(graphics(), Gosu::defaultFontName(), 20)
-    ,nodeImage(graphics(), L"node.png", true)
     {
         setCaption(L"GraphGame");
         auto surface = Cairo::ImageSurface::create(
