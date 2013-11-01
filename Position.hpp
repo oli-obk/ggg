@@ -79,6 +79,16 @@ inline Position operator*(double val, const PositionPtr pos) noexcept
     return (*pos)*val;
 }
 
+inline Position operator*(const PositionPtr lhs, double val) noexcept
+{
+    return (*lhs)*val;
+}
+
+inline Position operator/(const PositionPtr lhs, double val) noexcept
+{
+    return (*lhs)/val;
+}
+
 inline Position operator+(const PositionPtr lhs, const PositionPtr rhs) noexcept
 {
     return (*lhs)+(*rhs);
