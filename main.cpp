@@ -290,7 +290,7 @@ public:
         } else if (btn == Gosu::msRight) {
             if (connectingNode) {
                 auto selected = selectNode();
-                if (selected) {
+                if (selected && (selected != connectingNode)) {
                     // check for a connection first
                     if (!selected->getEdge(connectingNode)) {
                         selected->connect(connectingNode);

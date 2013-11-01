@@ -50,6 +50,7 @@ const EdgePtr Node::getEdge(const NodePtr other) const noexcept
 EdgePtr Node::connect(NodePtr other)
 {
     if (getEdge(other)) throw NodesAlreadyConnectedException("there is already an edge");
+    if (other == this) throw NodesAlreadyConnectedException("cannot connect to self");
     // create edge from here to there
     edges.push_back(std::make_unique<Edge>(this, other));
     // and the other direction
