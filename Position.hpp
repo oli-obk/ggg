@@ -1,4 +1,9 @@
 #import <cmath>
+#import "unmanaged_ptr.hpp"
+
+class Position;
+
+typedef unmanaged_ptr<Position> PositionPtr;
 
 class Position
 {
@@ -12,18 +17,33 @@ public:
     :Position(0, 0)
     {}
 
-    double distanceSquared(const Position& rhs) noexcept
+    double distanceSquared(const Position& rhs) const noexcept
     {
         auto diff = *this - rhs;
         return diff.x*diff.x + diff.y*diff.y;
     }
+    
+    double distanceSquared(const PositionPtr& rhs) const noexcept
+    {
+        return distanceSquared(*rhs);
+    }
 
-    Position operator-(const Position& rhs) noexcept
+    double distance(const Position& rhs) const noexcept
+    {
+        return std::sqrt(distanceSquared(rhs));
+    }
+    
+    double distance(const PositionPtr& rhs) const noexcept
+    {
+        return std::sqrt(distanceSquared(rhs));
+    }
+
+    Position operator-(const Position& rhs) const noexcept
     {
         return Position(x - rhs.x, y - rhs.y);
     }
 
-    Position operator+(const Position& rhs) noexcept
+    Position operator+(const Position& rhs) const noexcept
     {
         return Position(x + rhs.x, y + rhs.y);
     }
