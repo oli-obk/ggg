@@ -107,6 +107,10 @@ public:
             grabbedNode->x = input().mouseX();
             grabbedNode->y = input().mouseY();
         }
+    }
+    
+    void onGraphChanged()
+    {
         betweenness.run(graph);
     }
 
@@ -253,6 +257,7 @@ public:
             } else {
                 graph.deleteNode(selected);
             }
+            onGraphChanged();
         } else if (btn == Gosu::msRight) {
             if (connectingNode) {
                 auto selected = selectNode();
@@ -260,6 +265,7 @@ public:
                     // check for a connection first
                     if (!selected->getEdge(connectingNode)) {
                         selected->connect(connectingNode);
+                        onGraphChanged();
                     }
                 }
                 // release edge
