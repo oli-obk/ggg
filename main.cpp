@@ -57,7 +57,8 @@ class GameWindow : public Gosu::Window
     Gosu::Image nodeImage = {graphics(), L"node.png", true};
     Gosu::Image nodeFillImage = {graphics(), L"node_fill.png", true};
     Betweenness betweenness;
-    TurnbasedGame game = TurnbasedGame({{"Player 1", Gosu::Color::YELLOW}, {"Player 2", Gosu::Color::CYAN}});
+    // green and pink
+    TurnbasedGame game = TurnbasedGame({{"Player 1", Gosu::Color(49, 163, 84)}, {"Player 2", Gosu::Color(201, 148, 199)}});
     std::map<NodePtr, unmanaged_ptr<Player>> nodeOwner;
 public:
     GameWindow()
