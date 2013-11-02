@@ -12,7 +12,6 @@
 #import <sstream> // For int <-> string conversion
 #import <vector>
 
-#import <cairomm/cairomm.h>
 #import "optional.hpp"
 #import "unmanaged_ptr.hpp"
 
@@ -49,7 +48,6 @@ void drawLine(Gosu::Graphics& g, Gosu::Color col, double z, T pos, T pos2, Args.
 class GameWindow : public Gosu::Window
 {
     Gosu::Font font = {graphics(), Gosu::defaultFontName(), 20};
-    optional<Gosu::Image> img;
     Graph graph;
     unmanaged_ptr<Node> grabbedNode, connectingNode;
     NodePtr shortestDistSource;
@@ -65,37 +63,6 @@ public:
     :Window(640, 480, false)
     {
         setCaption(L"GraphGame");
-        auto surface = Cairo::ImageSurface::create(
-                        Cairo::FORMAT_ARGB32,
-                        240,
-                        80
-                        );
-        auto ctx = Cairo::Context::create(surface);
-        
-        ctx->save();
-        {
-            ctx->select_font_face("serif", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_BOLD);
-            ctx->set_font_size(32.0);
-            ctx->set_source_rgb(0.0, 0.0, 1.0);
-            ctx->move_to(10.0, 50.0);
-            ctx->show_text("Hello, world");
-        }
-        ctx->restore();
-        
-        surface->flush();
-        auto data = surface->get_data();
-        data = surface->get_data();
-        Gosu::Bitmap bmp(surface->get_width(), surface->get_height());
-        Gosu::Color* it = bmp.data();
-        for (size_t i = 0; i < surface->get_width()*surface->get_height(); i++) {
-            it->setAlpha(data[3]);
-            it->setRed(data[2]);
-            it->setGreen(data[1]);
-            it->setBlue(data[0]);
-            it++;
-            data += 4;
-        }
-        img.emplace(std::ref(graphics()), bmp);
         
         auto node = graph.createNode(Position(100, 100));
         auto node2 = graph.createNode(Position(150, 200));
